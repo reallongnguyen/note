@@ -3,7 +3,7 @@
 import Prism, { Token, TokenObject } from 'prismjs'
 import React, { useState, useCallback, useMemo, FC } from 'react'
 import { Slate, Editable, withReact, RenderElementProps } from 'slate-react'
-import { Text, createEditor, Element, Descendant } from 'slate'
+import { Text, createEditor, Element, Descendant, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { LinkOutline } from 'react-ionicons'
 
@@ -11,12 +11,9 @@ import { LinkOutline } from 'react-ionicons'
 Prism.languages.markdown = Prism.languages.extend('markup', {})
 Prism.languages.insertBefore('markdown', 'prolog', {
   blockquote: {
-    pattern: /^>(?:[\t ]*>)*\s[^\n\r]*/m,
+    pattern: /^>(?:[\t ]*>)*\s[^\s][^\n\r]*/m,
     inside: {
-      punctuation: /^>(?:[\t ]*>)*/,
-      string: {
-        pattern: /[^\n\r]+/,
-      },
+      punctuation: /^>(?:[\t ]*>)*\s/,
     },
   },
   code: [
@@ -62,9 +59,11 @@ Prism.languages.insertBefore('markdown', 'prolog', {
     alias: 'punctuation',
   },
   list: {
-    pattern: /(^\s*)(?:[*+-]|\d+\.)(?=[\t ].)/m,
+    pattern: /(^\s*)(?:[*+-])\s[^\s][^\r\n]*/m,
     lookbehind: !0,
-    alias: 'punctuation',
+    inside: {
+      punctuation: /(^\s*)(?:[*+-])+\s/m,
+    },
   },
   'url-reference': {
     pattern: /!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,
@@ -123,10 +122,22 @@ Prism.languages.insertBefore('markdown', 'prolog', {
   .italic as TokenObject).inside.bold = Prism.util.clone(
   Prism.languages.markdown.bold
 )
+// ;(Prism.languages.markdown.list as TokenObject).inside.url = Prism.util.clone(
+//   Prism.languages.markdown.url
+// )
+// ;(Prism.languages.markdown
+//   .blockquote as TokenObject).inside.url = Prism.util.clone(
+//   Prism.languages.markdown.url
+// )
 
 const MarkdownPreview: FC = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
-  const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
+  const renderLeaf = useCallback(
+    (props) => (
+      <Leaf {...props} changeURL={changeURL} changeHeading={changeHeading} />
+    ),
+    []
+  )
   const renderElement = useCallback((props) => <RenderElement {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(([node, path]) => {
@@ -160,24 +171,40 @@ const MarkdownPreview: FC = () => {
         console.log('link token', linkToken)
       }
 
+      const broRanges = {}
+
       for (const t of tokens) {
         const len = getLength(t)
         const e = s + len
 
         if (typeof t !== 'string') {
-          ranges.push({
-            [t.type]: true,
-            href: linkToken instanceof Token ? linkToken.content : undefined,
+          broRanges[t.type] = {
             anchor: { path, offset: s },
             focus: { path, offset: e },
-          })
+          }
+          const range: Record<string, any> = {
+            [t.type]: true,
+            anchor: { path, offset: s },
+            focus: { path, offset: e },
+          }
+
+          if (linkToken instanceof Token) {
+            range.href = linkToken.content
+          }
 
           if (Array.isArray(t.content)) {
-            decor(s, t.content)
+            const { broRanges: insideRanges } = decor(s, t.content)
+            range.insideRanges = insideRanges
           }
+
+          ranges.push(range)
         }
 
         s = e
+      }
+
+      return {
+        broRanges,
       }
     }
 
@@ -185,6 +212,21 @@ const MarkdownPreview: FC = () => {
 
     return ranges
   }, [])
+
+  const changeURL = (leaf: any) => () => {
+    Transforms.insertText(editor, 'long.me', { at: leaf.insideRanges.link })
+    Transforms.insertText(editor, 'long', { at: leaf.insideRanges.name })
+  }
+
+  const changeHeading = (leaf: any) => () => {
+    const range = leaf.insideRanges.punctuation
+    const length = range.focus.offset - range.anchor.offset - 1
+    const heading = '#'.repeat(length < 3 ? length + 1 : 1)
+
+    Transforms.insertText(editor, `${heading} `, {
+      at: leaf.insideRanges.punctuation,
+    })
+  }
 
   return (
     <Slate editor={editor} value={value} onChange={(value) => setValue(value)}>
@@ -211,7 +253,7 @@ const RenderElement = ({
   }
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
   console.log('leaf', leaf)
 
   if (leaf.code) {
@@ -235,11 +277,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   }
 
   if (leaf.italic) {
-    return (
-      <span className="italic" {...attributes}>
-        {children}
-      </span>
-    )
+    return <em {...attributes}>{children}</em>
   }
 
   if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
@@ -251,15 +289,45 @@ const Leaf = ({ attributes, children, leaf }) => {
   }
 
   if (leaf.h1) {
-    return <h1 {...attributes}>{children}</h1>
+    return (
+      <h1 className="relative" {...attributes}>
+        {children}
+        <span
+          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-1 select-none cursor-default"
+          onClick={changeHeading(leaf)}
+        >
+          H1
+        </span>
+      </h1>
+    )
   }
 
   if (leaf.h2) {
-    return <h2 {...attributes}>{children}</h2>
+    return (
+      <h2 className="relative" {...attributes}>
+        {children}
+        <span
+          className="absolute -left-6 text-xs font-sans text-gray-300 bottom-1 select-none cursor-default"
+          onClick={changeHeading(leaf)}
+        >
+          H2
+        </span>
+      </h2>
+    )
   }
 
   if (leaf.h3) {
-    return <h3 {...attributes}>{children}</h3>
+    return (
+      <h3 className="relative" {...attributes}>
+        {children}{' '}
+        <span
+          className="absolute -left-6 text-xs font-sans text-gray-300 bottom-0 select-none cursor-default"
+          onClick={changeHeading(leaf)}
+        >
+          H3
+        </span>
+      </h3>
+    )
   }
 
   if (leaf.blockquote && leaf.punctuation) {
@@ -286,8 +354,11 @@ const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.url && leaf.link) {
     return (
       <span {...attributes}>
-        <LinkOutline cssClasses="inline cursor-pointer" />
         <span className="hidden">{children}</span>
+        <LinkOutline
+          cssClasses="inline cursor-default"
+          onClick={changeURL(leaf)}
+        />
       </span>
     )
   }
@@ -296,6 +367,7 @@ const Leaf = ({ attributes, children, leaf }) => {
     return (
       <span {...attributes}>
         <a
+          className="text-red-450"
           href={leaf.href}
           target="_blank"
           rel="noreferrer"
@@ -310,10 +382,83 @@ const Leaf = ({ attributes, children, leaf }) => {
     )
   }
 
+  if (leaf.list && leaf.punctuation) {
+    return (
+      <span className="hidden" {...attributes}>
+        {children}
+      </span>
+    )
+  }
+
+  if (leaf.list) {
+    return (
+      <span className="relative" {...attributes}>
+        {children}
+        <span className="absolute -left-4 text-red-450 font-bold">•</span>
+      </span>
+    )
+  }
+
   return <span {...attributes}>{children}</span>
 }
 
 const initialValue: Element[] = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '# Todo list',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '- save note',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '- edit note',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '- add image',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '- support url inside list, block quote...',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '- code box',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '- publish note',
+      },
+    ],
+  },
   {
     type: 'paragraph',
     children: [{ text: '# Overview' }],

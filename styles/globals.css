@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.text-red-450 {
+  color: #f06332;
+}
+
 .markdown {
   line-height: 1.68;
   color: #3c4b62;
@@ -19,7 +23,7 @@
 .markdown h1 {
   line-height: 1.25;
   color: #1a202c;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 1.8rem;
 }
 
@@ -27,14 +31,14 @@
   color: #1a202c;
   line-height: 1.25;
   font-weight: 400;
-  font-size: 1.25rem;
+  font-size: 1.4rem;
 }
 
 .markdown h3 {
   color: #1a202c;
   line-height: 1.25;
-  font-weight: 500;
-  font-size: 1rem;
+  font-weight: 400;
+  font-size: 1.2rem;
 }
 
 .markdown ul:not(.medium-insert-buttons-addons) {
