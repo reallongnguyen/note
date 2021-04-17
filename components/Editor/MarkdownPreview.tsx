@@ -11,21 +11,11 @@ import { LinkOutline } from 'react-ionicons'
 Prism.languages.markdown = Prism.languages.extend('markup', {})
 Prism.languages.insertBefore('markdown', 'prolog', {
   blockquote: {
-    pattern: /^>(?:[\t ]*>)*\s[^\s][^\n\r]*/m,
+    pattern: /^>(?:[\t ]*>)*\s.+/m,
     inside: {
       punctuation: /^>(?:[\t ]*>)*\s/,
     },
   },
-  code: [
-    {
-      pattern: /``.+?``|`[^`\n]+`/,
-      alias: 'keyword',
-    },
-    {
-      pattern: /```(\n|\r)(.|\r?\n|\r)*?```/,
-      alias: 'keyword',
-    },
-  ],
   title: [
     {
       pattern: /\w+.*(?:\r?\n|\r)(?:==+|--+)/,
@@ -39,19 +29,19 @@ Prism.languages.insertBefore('markdown', 'prolog', {
     pattern: /(^\s*)#(?!#)\s.+/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#\s|#$/ },
+    inside: { punctuation: /^#\s/ },
   },
   h2: {
     pattern: /(^\s*)#{2}(?!#)\s.+/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#{2}\s|#{2}$/ },
+    inside: { punctuation: /^#{2}\s/ },
   },
   h3: {
     pattern: /(^\s*)#{3}(?!#)\s.+/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#{3}\s|#{3}$/ },
+    inside: { punctuation: /^#{3}\s/ },
   },
   hr: {
     pattern: /(^\s*)([*-])([\t ]*\2){2,}(?=\s*$)/m,
@@ -59,12 +49,23 @@ Prism.languages.insertBefore('markdown', 'prolog', {
     alias: 'punctuation',
   },
   list: {
-    pattern: /(^\s*)(?:[*+-])\s[^\s][^\r\n]*/m,
+    pattern: /(^\s*)(?:[*+-])\s.+/m,
     lookbehind: !0,
+    alias: 'important',
     inside: {
       punctuation: /(^\s*)(?:[*+-])+\s/m,
     },
   },
+  code: [
+    {
+      pattern: /``.+?``|`[^`\n]+`/,
+      alias: 'keyword',
+    },
+    {
+      pattern: /```(\n|\r)(.|\r?\n|\r)*?```/,
+      alias: 'keyword',
+    },
+  ],
   'url-reference': {
     pattern: /!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,
     inside: {
@@ -122,13 +123,16 @@ Prism.languages.insertBefore('markdown', 'prolog', {
   .italic as TokenObject).inside.bold = Prism.util.clone(
   Prism.languages.markdown.bold
 )
-// ;(Prism.languages.markdown.list as TokenObject).inside.url = Prism.util.clone(
-//   Prism.languages.markdown.url
-// )
-// ;(Prism.languages.markdown
-//   .blockquote as TokenObject).inside.url = Prism.util.clone(
-//   Prism.languages.markdown.url
-// )
+;(Prism.languages.markdown.list as TokenObject).inside.url = Prism.util.clone(
+  Prism.languages.markdown.url
+)
+;(Prism.languages.markdown.list as TokenObject).inside.code = Prism.util.clone(
+  Prism.languages.markdown.code
+)
+;(Prism.languages.markdown
+  .blockquote as TokenObject).inside.url = Prism.util.clone(
+  Prism.languages.markdown.url
+)
 
 const MarkdownPreview: FC = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
@@ -234,7 +238,6 @@ const MarkdownPreview: FC = () => {
         decorate={decorate}
         renderLeaf={renderLeaf}
         renderElement={renderElement}
-        placeholder="Write some markdown..."
       />
     </Slate>
   )
@@ -282,59 +285,49 @@ const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
 
   if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
     return (
-      <span className="hidden" {...attributes}>
-        {children}
-      </span>
+      <div
+        className={`
+          float-left relative
+          ${leaf.h1 && 'h-8'}
+          ${leaf.h2 && 'h-8'}
+          ${leaf.h3 && 'h-7'}
+        `}
+        {...attributes}
+      >
+        <span className="hidden">{children}</span>
+        <span
+          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 select-none cursor-default"
+          onClick={changeHeading(leaf)}
+          contentEditable={false}
+        >
+          H
+          <span className="text-xs">
+            {leaf.h1 && '1'}
+            {leaf.h2 && '2'}
+            {leaf.h3 && '3'}
+          </span>
+        </span>
+      </div>
     )
   }
 
   if (leaf.h1) {
-    return (
-      <h1 className="relative" {...attributes}>
-        {children}
-        <span
-          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-1 select-none cursor-default"
-          onClick={changeHeading(leaf)}
-        >
-          H1
-        </span>
-      </h1>
-    )
+    return <h1 {...attributes}>{children}</h1>
   }
 
   if (leaf.h2) {
-    return (
-      <h2 className="relative" {...attributes}>
-        {children}
-        <span
-          className="absolute -left-6 text-xs font-sans text-gray-300 bottom-1 select-none cursor-default"
-          onClick={changeHeading(leaf)}
-        >
-          H2
-        </span>
-      </h2>
-    )
+    return <h2 {...attributes}>{children}</h2>
   }
 
   if (leaf.h3) {
-    return (
-      <h3 className="relative" {...attributes}>
-        {children}{' '}
-        <span
-          className="absolute -left-6 text-xs font-sans text-gray-300 bottom-0 select-none cursor-default"
-          onClick={changeHeading(leaf)}
-        >
-          H3
-        </span>
-      </h3>
-    )
+    return <h3 {...attributes}>{children}</h3>
   }
 
   if (leaf.blockquote && leaf.punctuation) {
     return (
-      <span className="hidden float-left" {...attributes}>
+      <div className="hidden float-left" {...attributes}>
         {children}
-      </span>
+      </div>
     )
   }
 
@@ -346,7 +339,7 @@ const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
     return (
       <span className="text-center" {...attributes}>
         <span className="hidden">{children}</span>
-        <hr />
+        <hr contentEditable={false} className="select-none" />
       </span>
     )
   }
@@ -356,7 +349,7 @@ const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
       <span {...attributes}>
         <span className="hidden">{children}</span>
         <LinkOutline
-          cssClasses="inline cursor-default"
+          cssClasses="inline cursor-default select-none"
           onClick={changeURL(leaf)}
         />
       </span>
@@ -384,19 +377,20 @@ const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
 
   if (leaf.list && leaf.punctuation) {
     return (
-      <span className="hidden" {...attributes}>
-        {children}
-      </span>
+      <div className="relative" {...attributes}>
+        <span className="hidden">{children}</span>
+        <span
+          className="absolute -left-4 text-red-450 font-bold select-none"
+          contentEditable={false}
+        >
+          •
+        </span>
+      </div>
     )
   }
 
   if (leaf.list) {
-    return (
-      <span className="relative" {...attributes}>
-        {children}
-        <span className="absolute -left-4 text-red-450 font-bold">•</span>
-      </span>
-    )
+    return <div {...attributes}>{children}</div>
   }
 
   return <span {...attributes}>{children}</span>
@@ -407,7 +401,15 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '# Todo list',
+        text: '# Sample Note',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '## Todo list',
       },
     ],
   },
@@ -461,7 +463,7 @@ const initialValue: Element[] = [
   },
   {
     type: 'paragraph',
-    children: [{ text: '# Overview' }],
+    children: [{ text: '## Overview' }],
   },
   {
     type: 'paragraph',
@@ -474,7 +476,7 @@ const initialValue: Element[] = [
   },
   {
     type: 'paragraph',
-    children: [{ text: '## The Problem' }],
+    children: [{ text: '### The Problem' }],
   },
   {
     type: 'paragraph',
@@ -482,7 +484,7 @@ const initialValue: Element[] = [
   },
   {
     type: 'paragraph',
-    children: [{ text: '## The Consequences' }],
+    children: [{ text: '### The Consequences' }],
   },
   {
     type: 'paragraph',
@@ -498,7 +500,7 @@ const initialValue: Element[] = [
     children: [
       {
         text:
-          '# Over-optimism, Dunning-Kruger effect, pure uncertainty, or just math?',
+          '## Over-optimism, Dunning-Kruger effect, pure uncertainty, or just math?',
       },
     ],
   },
@@ -524,7 +526,7 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '# It’s just math!',
+        text: '## It’s just math!',
       },
     ],
   },

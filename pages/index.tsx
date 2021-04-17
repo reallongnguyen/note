@@ -9,22 +9,14 @@ export const Home = (): JSX.Element => (
     </Head>
 
     <main>
-      <div className="w-14 fixed top-0 z-40 h-screen bg-gray-700"></div>
-      <div className="w-screen pl-14 fixed top-0 z-10 h-screen bg-green-100">
-        <div className="relative h-full">
-          <div className="w-80 h-full absolute top-0">
-            <div className="h-full bg-gray-50 border-r border-gray-200"></div>
-          </div>
-          <div className="w-full h-full pl-80">
-            <div className="h-full">
-              <div className="h-full bg-gray-50">
-                <div className="pt-6 h-full overflow-auto">
-                  <div className="h-full px-12 markdown">
-                    <MarkdownPreview />
-                    <div className="h-8"></div>
-                  </div>
-                </div>
-              </div>
+      <div className="layout h-screen w-screen bg-gray-50">
+        <div className="bg-gray-700 h-screen w-14"></div>
+        <div className="border-r border-gray-200 h-screen w-80"></div>
+        <div className="h-screen">
+          <div className="pt-6 h-full overflow-auto">
+            <div className="h-full px-12 markdown">
+              <MarkdownPreview />
+              <div className="h-8"></div>
             </div>
           </div>
         </div>

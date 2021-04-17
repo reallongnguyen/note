@@ -21,24 +21,27 @@
 }
 
 .markdown h1 {
-  line-height: 1.25;
   color: #1a202c;
-  font-weight: 400;
-  font-size: 1.8rem;
+  font-weight: 500;
+  @apply text-3xl;
 }
 
 .markdown h2 {
   color: #1a202c;
-  line-height: 1.25;
   font-weight: 400;
-  font-size: 1.4rem;
+  @apply text-3xl;
 }
 
 .markdown h3 {
   color: #1a202c;
-  line-height: 1.25;
   font-weight: 400;
-  font-size: 1.2rem;
+  @apply text-2xl;
+}
+
+.markdown h4 {
+  color: #1a202c;
+  font-weight: 400;
+  @apply text-xl;
 }
 
 .markdown ul:not(.medium-insert-buttons-addons) {
@@ -66,14 +69,14 @@
 }
 
 .markdown h1 {
-  margin-top: 2rem;
-}
-
-.markdown h1:first {
-  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 .markdown h2 {
+  margin-top: 2rem;
+}
+
+.markdown h3 {
   margin-top: 1.5rem;
 }
 
@@ -255,4 +258,9 @@ p.markdown {
   );
   margin: 30px auto;
   width: 40%;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
 }
