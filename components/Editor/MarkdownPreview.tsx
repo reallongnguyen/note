@@ -423,7 +423,7 @@ const initialValue: Element[] = [
   },
   {
     type: 'paragraph',
-    children: [{ text: '' }],
+    children: [{ text: '### Thông tin' }],
   },
   {
     type: 'paragraph',

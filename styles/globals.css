@@ -22,8 +22,8 @@
 
 .markdown h1 {
   color: #1a202c;
-  font-weight: 500;
-  @apply text-3xl;
+  font-weight: 400;
+  @apply text-4xl;
 }
 
 .markdown h2 {
