@@ -10,12 +10,6 @@ import { LinkOutline } from 'react-ionicons'
 // eslint-disable-next-line
 Prism.languages.markdown = Prism.languages.extend('markup', {})
 Prism.languages.insertBefore('markdown', 'prolog', {
-  blockquote: {
-    pattern: /^>(?:[\t ]*>)*\s.+/m,
-    inside: {
-      punctuation: /^>(?:[\t ]*>)*\s/,
-    },
-  },
   title: [
     {
       pattern: /\w+.*(?:\r?\n|\r)(?:==+|--+)/,
@@ -66,6 +60,12 @@ Prism.languages.insertBefore('markdown', 'prolog', {
       alias: 'keyword',
     },
   ],
+  blockquote: {
+    pattern: /^>(?:[\t ]*>)*\s.+/m,
+    inside: {
+      punctuation: /^>(?:[\t ]*>)*\s/,
+    },
+  },
   'url-reference': {
     pattern: /!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,
     inside: {
@@ -128,6 +128,9 @@ Prism.languages.insertBefore('markdown', 'prolog', {
 )
 ;(Prism.languages.markdown.list as TokenObject).inside.code = Prism.util.clone(
   Prism.languages.markdown.code
+)
+;(Prism.languages.markdown.list as TokenObject).inside.bold = Prism.util.clone(
+  Prism.languages.markdown.bold
 )
 ;(Prism.languages.markdown
   .blockquote as TokenObject).inside.url = Prism.util.clone(
@@ -323,18 +326,6 @@ const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
     return <h3 {...attributes}>{children}</h3>
   }
 
-  if (leaf.blockquote && leaf.punctuation) {
-    return (
-      <div className="hidden float-left" {...attributes}>
-        {children}
-      </div>
-    )
-  }
-
-  if (leaf.blockquote) {
-    return <blockquote {...attributes}>{children}</blockquote>
-  }
-
   if (leaf.hr) {
     return (
       <span className="text-center" {...attributes}>
@@ -375,6 +366,18 @@ const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
     )
   }
 
+  if (leaf.blockquote && leaf.punctuation) {
+    return (
+      <div className="float-left blockquote w-0" {...attributes}>
+        <span className="invisible">{children}</span>
+      </div>
+    )
+  }
+
+  if (leaf.blockquote) {
+    return <span {...attributes}>{children}</span>
+  }
+
   if (leaf.list && leaf.punctuation) {
     return (
       <div className="relative" {...attributes}>
@@ -390,7 +393,7 @@ const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
   }
 
   if (leaf.list) {
-    return <div {...attributes}>{children}</div>
+    return <span {...attributes}>{children}</span>
   }
 
   return <span {...attributes}>{children}</span>
@@ -401,97 +404,60 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '# Sample Note',
+        text: '# Giới thiệu nhân vật Genshin Impact',
       },
     ],
   },
   {
     type: 'paragraph',
-    children: [
-      {
-        text: '## Todo list',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- save note',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- edit note',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- add image',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- support url inside list, block quote...',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- code box',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- publish note',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: '## Overview' }],
+    children: [{ text: '## Nhà Thơ Có Màu Của Gió · Venti' }],
   },
   {
     type: 'paragraph',
     children: [
       {
         text:
-          'Let’s first have a birds-eye view of the problem, the consequences, and the potential root causes. I will be covering most of these during this series.',
+          'Một thi hào có lai lịch không rõ ràng, có lúc cậu cất lên những bài thơ cũ rích, có khi cậu lại biết hát ra những bài ca mà chưa ai từng nghe cả. Thân phận thật sự là Phong Thần Barbatos.',
       },
     ],
   },
   {
     type: 'paragraph',
-    children: [{ text: '### The Problem' }],
+    children: [{ text: '' }],
   },
   {
     type: 'paragraph',
-    children: [{ text: 'Software projects seldom meet the deadline.' }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: '### The Consequences' }],
+    children: [{ text: '- Hệ: Trap - Phong - Tửu' }],
   },
   {
     type: 'paragraph',
     children: [
       {
-        text:
-          'Marketing efforts can be wasted, clients can be dissatisfied, stressed developers can write poor quality code to meet deadlines and compromise product reliability, and ultimately, projects can outright get canceled.',
+        text: '- Kỹ năng: Làm thơ, bắn bóng bay, nuno...',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '- Danh ngôn: ehe',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '## Qiqi · Thiếu nữ đáng yêu',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '> Mình là Qiqi, là một cương thi... Ừm, phải nói gì nữa nhỉ...',
       },
     ],
   },
@@ -500,7 +466,15 @@ const initialValue: Element[] = [
     children: [
       {
         text:
-          '## Over-optimism, Dunning-Kruger effect, pure uncertainty, or just math?',
+          "An apprentice and herb gatherer at Bubu Pharmacy. _Blessed_ by the [adepti](https://genshin-impact.fandom.com/wiki/Adepti) with a body that cannot die, this petite zombie cannot do anything without first giving herself orders to do it. Qiqi's memory is like a sieve. Out of necessity, she always carries around a notebook in which she writes anything important that she is sure to forget later. But on her worst days, she even forgets to look at her notebook...",
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '### Personality',
       },
     ],
   },
@@ -509,7 +483,7 @@ const initialValue: Element[] = [
     children: [
       {
         text:
-          'It’s easy to dismiss the concept of over-optimism all together just because it’s [common](https://isling.me) sense that no developer who ever struggled to meet a deadline will be optimistic when setting deadlines. Now if project management is not coming from an engineering background and they set deadlines without knowing what they are doing, that’s a whole different issue that is outside the scope of this article.',
+          "Qiqi has a quiet, yet polite demeanor when dealing with customers at the pharmacy. As a zombie, Qiqi has trouble retaining memories and can quickly forget about people if she doesn't continually reinforce herself with an impression of them. In addition to having a somewhat flat voice, she lacks the ability to properly form facial expressions due to her undead nature, which can make it difficult for her to convey emotion. Although zombies have to be issued orders when awoken, because Qiqi had done so herself, she has to give herself orders in order to perform her duties. She takes her duties seriously, carrying a notebook in which she details everything she needs to do for the day, which also serves as a reminder incase she forgets something. She also strides to improve herself so she becomes less forgetful.",
       },
     ],
   },
@@ -518,15 +492,7 @@ const initialValue: Element[] = [
     children: [
       {
         text:
-          'Some also attribute bad time _estimation_ to the **Dunning-Kruger effect**, however, if inexperience or overestimating one’s ability is behind underestimating time then definitely more experience should alleviate the issue, right? The biggest companies out there with almost infinite resources still have a shockingly high rate of missing deadlines, so that hypothesis is debunked. Not to mention, we have all experienced this ourselves. More experience barely helps when it comes to time estimates.',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '## It’s just math!',
+          'She uses her Cryo Vision to protect those that she cares for. Due to being a zombie, she prefers cold weather, as hot weather makes her feel uncomfortable.',
       },
     ],
   },
@@ -535,7 +501,15 @@ const initialValue: Element[] = [
     children: [
       {
         text:
-          '> That’s where we need to draw the distinction that a single task isn’t representative of the project and vice versa.',
+          'On particularly foul days however, **she may forget to check on her notebook**. She is also fond of `coconut milk` and finches for reasons unknown, though she initially mistakes the former as `cocogoat milk`.',
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '### Ghét >"<',
       },
     ],
   },
@@ -544,7 +518,7 @@ const initialValue: Element[] = [
     children: [
       {
         text:
-          'Normal distributions are all around us and the `human brain` is pretty used to them. We are experts at estimating things following a normal distribution by nature; **it’s the basis of _gaining_ experience by exposure.**',
+          '- [hutao](https://i.redd.it/94ic2qkkuh961.png) Con hutao mày đừng hù tao',
       },
     ],
   },
@@ -552,7 +526,7 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '# H1',
+        text: '- [hutao](https://i.redd.it/94ic2qkkuh961.png)',
       },
     ],
   },
@@ -560,7 +534,7 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '# H1',
+        text: '- [hutao](https://i.redd.it/94ic2qkkuh961.png)',
       },
     ],
   },
@@ -568,7 +542,7 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '## H2',
+        text: '### Không ghét :>',
       },
     ],
   },
@@ -576,7 +550,7 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '## H2',
+        text: '- anh **quái vật**',
       },
     ],
   },
@@ -584,31 +558,7 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: '### H3',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '### H3',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- item 1',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '- item 2',
+        text: '- chị `dê dừa`',
       },
     ],
   },

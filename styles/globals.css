@@ -35,13 +35,13 @@
 .markdown h3 {
   color: #1a202c;
   font-weight: 400;
-  @apply text-2xl;
+  @apply text-xl;
 }
 
 .markdown h4 {
   color: #1a202c;
   font-weight: 400;
-  @apply text-xl;
+  @apply text-lg;
 }
 
 .markdown ul:not(.medium-insert-buttons-addons) {
@@ -125,11 +125,9 @@
 /*  content: counter(first) "." counter(second) "." counter(third) "."*/
 /*} */
 
-.markdown blockquote {
+.markdown .blockquote {
   border-left: 3px solid #eee;
   padding-left: 14px;
-  font-weight: 500;
-  color: #1a202c;
 }
 
 .markdown strong,
