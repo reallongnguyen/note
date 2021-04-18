@@ -12,6 +12,9 @@ export const isImageUrl = (url: string): boolean => {
 }
 
 export const insertImage = (editor: Editor, url: string): void => {
+  if (!editor.selection) {
+    return
+  }
   return insertImageAt(editor, url, editor.selection)
 }
 
@@ -22,7 +25,6 @@ export const insertImageAt = (
 ): void => {
   const text = { text: '' }
   const image: ImageElement = { type: 'image', url, children: [text] }
-  Transforms.removeNodes(editor, { at })
   Transforms.insertNodes(editor, image, { at })
   const nextLine = Editor.after(editor, at, { unit: 'line' })
   Transforms.insertNodes(
