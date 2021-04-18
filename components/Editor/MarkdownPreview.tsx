@@ -1,144 +1,37 @@
 // @refresh reset
 /* eslint-disable no-console */
-import Prism, { Token, TokenObject } from 'prismjs'
-import React, { useState, useCallback, useMemo, FC } from 'react'
-import { Slate, Editable, withReact, RenderElementProps } from 'slate-react'
-import { Text, createEditor, Element, Descendant, Transforms } from 'slate'
+import Prism, { Token } from 'prismjs'
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  FC,
+  useEffect,
+  useRef,
+} from 'react'
+import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
+import {
+  Text,
+  createEditor,
+  Element,
+  Descendant,
+  Transforms,
+  Range,
+  Editor,
+  BaseRange,
+} from 'slate'
 import { withHistory } from 'slate-history'
-import { LinkOutline } from 'react-ionicons'
-
-// eslint-disable-next-line
-Prism.languages.markdown = Prism.languages.extend('markup', {})
-Prism.languages.insertBefore('markdown', 'prolog', {
-  title: [
-    {
-      pattern: /\w+.*(?:\r?\n|\r)(?:==+|--+)/,
-      alias: 'important',
-      inside: {
-        punctuation: /==+$|--+$/,
-      },
-    },
-  ],
-  h1: {
-    pattern: /(^\s*)#(?!#)\s.+/m,
-    lookbehind: !0,
-    alias: 'important',
-    inside: { punctuation: /^#\s/ },
-  },
-  h2: {
-    pattern: /(^\s*)#{2}(?!#)\s.+/m,
-    lookbehind: !0,
-    alias: 'important',
-    inside: { punctuation: /^#{2}\s/ },
-  },
-  h3: {
-    pattern: /(^\s*)#{3}(?!#)\s.+/m,
-    lookbehind: !0,
-    alias: 'important',
-    inside: { punctuation: /^#{3}\s/ },
-  },
-  hr: {
-    pattern: /(^\s*)([*-])([\t ]*\2){2,}(?=\s*$)/m,
-    lookbehind: !0,
-    alias: 'punctuation',
-  },
-  list: {
-    pattern: /(^\s*)(?:[*+-])\s.+/m,
-    lookbehind: !0,
-    alias: 'important',
-    inside: {
-      punctuation: /(^\s*)(?:[*+-])+\s/m,
-    },
-  },
-  code: [
-    {
-      pattern: /``.+?``|`[^`\n]+`/,
-      alias: 'keyword',
-    },
-    {
-      pattern: /```(\n|\r)(.|\r?\n|\r)*?```/,
-      alias: 'keyword',
-    },
-  ],
-  blockquote: {
-    pattern: /^>(?:[\t ]*>)*\s.+/m,
-    inside: {
-      punctuation: /^>(?:[\t ]*>)*\s/,
-    },
-  },
-  'url-reference': {
-    pattern: /!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,
-    inside: {
-      variable: {
-        pattern: /^(!?\[)[^\]]+/,
-        lookbehind: !0,
-      },
-      string: /(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\))$/,
-      punctuation: /^[[\]!:]|[<>]/,
-    },
-    alias: 'url',
-  },
-  bold: {
-    pattern: /(^|[^\\])(\*\*|__)(?:(?:\r?\n|\r)(?!\r?\n|\r)|.)+?\2/,
-    lookbehind: !0,
-    inside: {
-      punctuation: /^\*\*|^__|\*\*$|__$/,
-    },
-  },
-  italic: {
-    pattern: /(^|[^\\])([*_])(?:(?:\r?\n|\r)(?!\r?\n|\r)|.)+?\2/,
-    lookbehind: !0,
-    inside: {
-      punctuation: /^[*_]|[*_]$/,
-    },
-  },
-  url: {
-    pattern: /!?\[[^\]]+\](?:\([^\s)]+(?:[\t ]+"(?:\\.|[^"\\])*")?\)| ?\[[^\]\n]*\])/,
-    inside: {
-      variable: {
-        pattern: /(!?\[)[^\]]+(?=\]$)/,
-        lookbehind: !0,
-      },
-      link: {
-        pattern: /[^()"]+?(?=(\)|\s))/,
-      },
-      name: {
-        pattern: /[^[\]]+(?=\])/,
-      },
-      punctuation: /^\[|\)$|]|\(/,
-    },
-  },
-})
-;(Prism.languages.markdown.bold as TokenObject).inside.url = Prism.util.clone(
-  Prism.languages.markdown.url
-)
-;(Prism.languages.markdown.italic as TokenObject).inside.url = Prism.util.clone(
-  Prism.languages.markdown.url
-)
-;(Prism.languages.markdown
-  .bold as TokenObject).inside.italic = Prism.util.clone(
-  Prism.languages.markdown.italic
-)
-;(Prism.languages.markdown
-  .italic as TokenObject).inside.bold = Prism.util.clone(
-  Prism.languages.markdown.bold
-)
-;(Prism.languages.markdown.list as TokenObject).inside.url = Prism.util.clone(
-  Prism.languages.markdown.url
-)
-;(Prism.languages.markdown.list as TokenObject).inside.code = Prism.util.clone(
-  Prism.languages.markdown.code
-)
-;(Prism.languages.markdown.list as TokenObject).inside.bold = Prism.util.clone(
-  Prism.languages.markdown.bold
-)
-;(Prism.languages.markdown
-  .blockquote as TokenObject).inside.url = Prism.util.clone(
-  Prism.languages.markdown.url
-)
+import './prismMarkdown'
+import Leaf from './Leaf'
+import RenderElement from './RenderElement'
+import { withImages, isImageUrl, insertImageAt } from './plugins'
+import { CustomText } from './customType'
+import { ImageOutline } from 'react-ionicons'
 
 const MarkdownPreview: FC = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [emptyLinePos, setEmptyLinePos] = useState<BaseRange>(null)
+  const plusBtnRef = useRef<HTMLDivElement>(null)
   const renderLeaf = useCallback(
     (props) => (
       <Leaf {...props} changeURL={changeURL} changeHeading={changeHeading} />
@@ -146,7 +39,10 @@ const MarkdownPreview: FC = () => {
     []
   )
   const renderElement = useCallback((props) => <RenderElement {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(
+    () => withImages(withHistory(withReact(createEditor()))),
+    []
+  )
   const decorate = useCallback(([node, path]) => {
     const ranges = []
 
@@ -235,168 +131,67 @@ const MarkdownPreview: FC = () => {
     })
   }
 
+  const addImage = () => {
+    if (emptyLinePos) {
+      const url = window.prompt('Enter the URL of the image:')
+      if (url && !isImageUrl(url)) {
+        alert('URL is not an image')
+        return
+      }
+
+      insertImageAt(editor, url, emptyLinePos)
+    }
+  }
+
+  const handleChangeValue = (value: Descendant[]) => {
+    setValue(value)
+
+    const { selection } = editor
+    if (selection && Range.isCollapsed(selection)) {
+      const [start] = Range.edges(selection)
+      const [node] = Editor.node(editor, start)
+
+      if ((node as CustomText).text === '') {
+        setEmptyLinePos(selection)
+      } else {
+        setEmptyLinePos(null)
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (!emptyLinePos || !plusBtnRef.current) {
+      return
+    }
+    const ele = ReactEditor.toDOMRange(editor, emptyLinePos)
+    const rec = ele.getBoundingClientRect()
+
+    plusBtnRef.current.style.top = `calc(${rec.top}px - 0.2rem)`
+    plusBtnRef.current.style.left = `calc(${rec.left}px - 2rem)`
+  }, [emptyLinePos])
+
   return (
-    <Slate editor={editor} value={value} onChange={(value) => setValue(value)}>
+    <Slate editor={editor} value={value} onChange={handleChangeValue}>
       <Editable
         decorate={decorate}
         renderLeaf={renderLeaf}
         renderElement={renderElement}
       />
+      {emptyLinePos && (
+        <div ref={plusBtnRef} className="fixed">
+          <div
+            className="cursor-pointer w-6 h-6 flex justify-center items-center rounded-full border border-gray-400"
+            onClick={addImage}
+          >
+            <ImageOutline
+              width="1rem"
+              style={{ color: 'rgba(156, 163, 175, 1)' }}
+            />
+          </div>
+        </div>
+      )}
     </Slate>
   )
-}
-
-const RenderElement = ({
-  attributes,
-  children,
-  element,
-}: RenderElementProps) => {
-  switch (element.type) {
-    case 'paragraph':
-      return <div {...attributes}>{children}</div>
-    default:
-      return <div {...attributes}>{children}</div>
-  }
-}
-
-const Leaf = ({ attributes, children, leaf, changeURL, changeHeading }) => {
-  console.log('leaf', leaf)
-
-  if (leaf.code) {
-    return <code {...attributes}>{children}</code>
-  }
-
-  if (leaf.punctuation && (leaf.bold || leaf.italic || leaf.url)) {
-    return (
-      <span className="text-gray-300" {...attributes}>
-        {children}
-      </span>
-    )
-  }
-
-  if (leaf.bold) {
-    return (
-      <strong className={leaf.italic ? `italic` : ''} {...attributes}>
-        {children}
-      </strong>
-    )
-  }
-
-  if (leaf.italic) {
-    return <em {...attributes}>{children}</em>
-  }
-
-  if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
-    return (
-      <div
-        className={`
-          float-left relative
-          ${leaf.h1 && 'h-8'}
-          ${leaf.h2 && 'h-8'}
-          ${leaf.h3 && 'h-7'}
-        `}
-        {...attributes}
-      >
-        <span className="hidden">{children}</span>
-        <span
-          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 select-none cursor-default"
-          onClick={changeHeading(leaf)}
-          contentEditable={false}
-        >
-          H
-          <span className="text-xs">
-            {leaf.h1 && '1'}
-            {leaf.h2 && '2'}
-            {leaf.h3 && '3'}
-          </span>
-        </span>
-      </div>
-    )
-  }
-
-  if (leaf.h1) {
-    return <h1 {...attributes}>{children}</h1>
-  }
-
-  if (leaf.h2) {
-    return <h2 {...attributes}>{children}</h2>
-  }
-
-  if (leaf.h3) {
-    return <h3 {...attributes}>{children}</h3>
-  }
-
-  if (leaf.hr) {
-    return (
-      <span className="text-center" {...attributes}>
-        <span className="hidden">{children}</span>
-        <hr contentEditable={false} className="select-none" />
-      </span>
-    )
-  }
-
-  if (leaf.url && leaf.link) {
-    return (
-      <span {...attributes}>
-        <span className="hidden">{children}</span>
-        <LinkOutline
-          cssClasses="inline cursor-default select-none"
-          onClick={changeURL(leaf)}
-        />
-      </span>
-    )
-  }
-
-  if (leaf.url && leaf.name) {
-    return (
-      <span {...attributes}>
-        <a
-          className="text-red-450"
-          href={leaf.href}
-          target="_blank"
-          rel="noreferrer"
-          onClick={(e) => {
-            e.preventDefault()
-            window.open(leaf.href, '_blank')
-          }}
-        >
-          {children}
-        </a>
-      </span>
-    )
-  }
-
-  if (leaf.blockquote && leaf.punctuation) {
-    return (
-      <div className="float-left blockquote w-0" {...attributes}>
-        <span className="invisible">{children}</span>
-      </div>
-    )
-  }
-
-  if (leaf.blockquote) {
-    return <span {...attributes}>{children}</span>
-  }
-
-  if (leaf.list && leaf.punctuation) {
-    return (
-      <div className="relative" {...attributes}>
-        <span className="hidden">{children}</span>
-        <span
-          className="absolute -left-4 text-red-450 font-bold select-none"
-          contentEditable={false}
-        >
-          •
-        </span>
-      </div>
-    )
-  }
-
-  if (leaf.list) {
-    return <span {...attributes}>{children}</span>
-  }
-
-  return <span {...attributes}>{children}</span>
 }
 
 const initialValue: Element[] = [

@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  padding: 0;
+  margin: 0;
+  color: rgba(1, 1, 1, 0.85);
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 .text-red-450 {
   color: #f06332;
 }
@@ -14,6 +27,7 @@
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   word-break: break-word;
+  @apply max-w-3xl;
 }
 
 .markdown > div > * + * {
@@ -23,13 +37,13 @@
 .markdown h1 {
   color: #1a202c;
   font-weight: 400;
-  @apply text-4xl;
+  @apply text-3xl;
 }
 
 .markdown h2 {
   color: #1a202c;
   font-weight: 400;
-  @apply text-3xl;
+  @apply text-2xl;
 }
 
 .markdown h3 {
@@ -261,4 +275,8 @@ p.markdown {
 .layout {
   display: grid;
   grid-template-columns: auto auto 1fr;
+}
+
+.element-selected {
+  box-shadow: rgb(180 213 255) 0px 0px 0px 3px;
 }

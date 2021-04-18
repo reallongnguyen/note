@@ -80,14 +80,21 @@ type CustomElement =
   | VideoElement
 
 export type CustomText = {
+  text: string
   bold?: boolean
   italic?: boolean
   code?: boolean
-  text: string
-}
-
-export type EmptyText = {
-  text: string
+  punctuation?: boolean
+  url?: boolean
+  link?: boolean // url inside property
+  name?: boolean // url inside property
+  href?: string // url href
+  h1?: boolean
+  h2?: boolean
+  h3?: boolean
+  hr?: boolean
+  blockquote?: boolean
+  list?: boolean
 }
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor
@@ -96,6 +103,6 @@ declare module 'slate' {
   interface CustomTypes {
     Editor: CustomEditor
     Element: CustomElement
-    Text: CustomText | EmptyText
+    Text: CustomText
   }
 }
