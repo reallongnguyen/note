@@ -23,7 +23,7 @@ const RenderElement = ({
   attributes,
   children,
   element,
-}: RenderElementProps): any => {
+}: RenderElementProps): JSX.Element => {
   switch (element.type) {
     case 'paragraph':
       return <div {...attributes}>{children}</div>

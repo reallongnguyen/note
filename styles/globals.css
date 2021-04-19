@@ -281,3 +281,23 @@ p.markdown {
 .element-selected {
   box-shadow: rgb(180 213 255) 0px 0px 0px 3px;
 }
+
+.btn {
+  color: #f06332;
+  @apply outline-none cursor-pointer transition-all duration-75 border border-gray-400;
+}
+
+.btn:hover,
+.btn:focus {
+  background: #f06332;
+  border: #f06332;
+  @apply text-gray-50 outline-none;
+}
+
+.btn:active {
+  filter: brightness(0.8);
+}
+
+.btn-rounded {
+  @apply rounded-full;
+}

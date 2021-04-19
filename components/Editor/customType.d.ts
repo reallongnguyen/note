@@ -60,24 +60,24 @@ export type VideoElement = { type: 'video'; url: string; children: EmptyText[] }
 export type HRElement = { type: 'hr'; text: string }
 
 type CustomElement =
-  | BlockQuoteElement
-  | BulletedListElement
-  | CheckListItemElement
-  | EditableVoidElement
-  | HeadingElement
-  | HeadingTwoElement
-  | HeadingThreeElement
-  | HRElement
+  // | BlockQuoteElement
+  // | BulletedListElement
+  // | CheckListItemElement
+  // | EditableVoidElement
+  // | HeadingElement
+  // | HeadingTwoElement
+  // | HeadingThreeElement
+  // | HRElement
   | ImageElement
-  | LinkElement
-  | ListItemElement
-  | MentionElement
+  // | LinkElement
+  // | ListItemElement
+  // | MentionElement
   | ParagraphElement
-  | TableElement
-  | TableRowElement
-  | TableCellElement
-  | TitleElement
-  | VideoElement
+// | TableElement
+// | TableRowElement
+// | TableCellElement
+// | TitleElement
+// | VideoElement
 
 export type CustomText = {
   text: string

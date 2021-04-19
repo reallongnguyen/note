@@ -11,7 +11,7 @@ const Leaf = ({
   leaf,
   changeURL,
   changeHeading,
-}: RenderLeafProps & CustomFunc): any => {
+}: RenderLeafProps & CustomFunc): JSX.Element => {
   console.log('leaf', leaf)
 
   if (leaf.code) {
