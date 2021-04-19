@@ -166,8 +166,8 @@ const MarkdownPreview: FC = () => {
     const ele = ReactEditor.toDOMRange(editor, emptyLinePos)
     const rec = ele.getBoundingClientRect()
 
-    plusBtnRef.current.style.top = `calc(${rec.top}px - 0.2rem)`
-    plusBtnRef.current.style.left = `calc(${rec.left}px - 2rem)`
+    plusBtnRef.current.style.top = `calc(${rec.top}px)`
+    plusBtnRef.current.style.left = `calc(${rec.left}px)`
   }, [emptyLinePos])
 
   return (
@@ -180,13 +180,10 @@ const MarkdownPreview: FC = () => {
       {emptyLinePos && (
         <div ref={plusBtnRef} className="fixed">
           <div
-            className="cursor-pointer w-6 h-6 flex justify-center items-center rounded-full border border-gray-400"
+            className="cursor-pointer w-8 h-8 flex justify-center items-center rounded-full border border-gray-400 -translate-y-2 -translate-x-10 transform"
             onClick={addImage}
           >
-            <ImageOutline
-              width="1rem"
-              style={{ color: 'rgba(156, 163, 175, 1)' }}
-            />
+            <ImageOutline width="1.2rem" style={{ color: '#f06332' }} />
           </div>
         </div>
       )}

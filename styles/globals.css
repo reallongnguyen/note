@@ -27,11 +27,12 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   word-break: break-word;
-  @apply max-w-3xl;
+  @apply max-w-2xl;
 }
 
 .markdown > div > * + * {
   margin-top: 0.5rem;
+  @apply text-justify;
 }
 
 .markdown h1 {

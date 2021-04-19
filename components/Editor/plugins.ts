@@ -26,6 +26,7 @@ export const insertImageAt = (
   const text = { text: '' }
   const image: ImageElement = { type: 'image', url, children: [text] }
   Transforms.insertNodes(editor, image, { at })
+  Transforms.removeNodes(editor, { at })
   const nextLine = Editor.after(editor, at, { unit: 'line' })
   Transforms.insertNodes(
     editor,
