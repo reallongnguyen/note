@@ -1,12 +1,15 @@
 import axios from 'axios'
 import { FC } from 'react'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { curNoteSelector, notesState } from '../../store/notes'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import Image from 'next/image'
+import { curNoteSelector, noteStore } from '../../store/notes'
 import MarkdownPreview from './MarkdownPreview'
 
 const EditorContainer: FC = () => {
   const curNote = useRecoilValue(curNoteSelector)
-  const setNoteStore = useSetRecoilState(notesState)
+  const [allNotes, setNoteStore] = useRecoilState(noteStore)
+
+  const noteCount = Object.keys(allNotes).length
 
   const updateNote = async (content: string) => {
     if (!curNote) {
@@ -27,7 +30,16 @@ const EditorContainer: FC = () => {
 
   return (
     <>
-      {!curNote && <div className="">Bear here</div>}
+      {!curNote && (
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <div className="opacity-20">
+            <Image src="/images/qiqi-confused.png" width="320" height="320" />
+          </div>
+          <div className="text-gray-400 mt-6">
+            {noteCount} {noteCount < 2 ? 'note' : 'notes'}
+          </div>
+        </div>
+      )}
       {curNote && (
         <MarkdownPreview
           initialContent={curNote.content}

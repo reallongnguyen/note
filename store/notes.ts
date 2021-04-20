@@ -1,7 +1,7 @@
 import { Note } from '@prisma/client'
 import { atom, selector } from 'recoil'
 
-export const notesState = atom<Record<number, Note>>({
+export const noteStore = atom<Record<number, Note>>({
   key: 'notesState',
   default: {},
 })
@@ -9,7 +9,7 @@ export const notesState = atom<Record<number, Note>>({
 export const notesSelector = selector<Note[]>({
   key: 'notesSelector',
   get: ({ get }) => {
-    const notes = get(notesState)
+    const notes = get(noteStore)
 
     return Object.values(notes)
   },
@@ -23,7 +23,7 @@ export const curNoteIdState = atom<number | null>({
 export const curNoteSelector = selector<Note | null>({
   key: 'notesSelector',
   get: ({ get }) => {
-    const notes = get(notesState)
+    const notes = get(noteStore)
     const curNoteId = get(curNoteIdState)
 
     return curNoteId && notes[curNoteId]

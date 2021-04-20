@@ -3,7 +3,7 @@ import axios from 'axios'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { AddOutline, SearchOutline } from 'react-ionicons'
 import { useRecoilState } from 'recoil'
-import { curNoteIdState, notesState } from '../../store/notes'
+import { curNoteIdState, noteStore } from '../../store/notes'
 
 export interface NotePreviewProps {
   note: Note
@@ -17,17 +17,17 @@ const NotePreview: FC<NotePreviewProps> = ({ note }) => {
     <div className="grid grid-flow-col grid-cols-12">
       <div className="col-span-2 text-gray-400 pl-3 pt-2">2M</div>
       <div className="col-span-10 col-start-3 border-b border-gray-200 pt-2 pr-2 pb-3">
-        <div className="mb-1 text-gray-700 truncate w-full">
+        <div className="mb-1 text-gray-700 truncate w-full block">
           {isEmptyNote && <div>New note</div>}
           {!isEmptyNote && <div>{title}</div>}
         </div>
         <div className="text-gray-400 text-sm">
           {isEmptyNote && <div className="">You just need some words</div>}
           {!isEmptyNote && (
-            <div className="text-gray-400">
+            <div className="text-gray-400 block">
               {note.content
                 .slice(0, 240)
-                .replace(/^#\s+(.+?)\s*\n/, '')
+                .replace(/^#\s+(.+?)\s*(\n|$)/, '')
                 .replace(/#{1,3}\s+/g, '')
                 .replace(/\.\s*\n/g, '. ')
                 .replace(/\n/g, '. ')
@@ -49,7 +49,7 @@ export interface Props {
 const SideBar: FC<Props> = (props) => {
   const [noteIds, setNoteIds] = useState<number[]>([])
   const [curNoteId, setCurNoteId] = useRecoilState(curNoteIdState)
-  const [allNotes, setAllNotes] = useRecoilState(notesState)
+  const [allNotes, setAllNotes] = useRecoilState(noteStore)
 
   const notes = useMemo(() => {
     return noteIds.filter((id) => allNotes[id]).map((id) => allNotes[id])

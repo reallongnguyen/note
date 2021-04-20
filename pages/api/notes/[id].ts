@@ -24,7 +24,7 @@ export default async function handle(
   if (req.method === 'PATCH') {
     const { content } = req.body
 
-    const execArr = /^#\s+(.+?)\s*\n/.exec(content)
+    const execArr = /^#\s+(.+?)\s*(\n|$)/.exec(content)
     const title = execArr && execArr[1]
 
     const note = await prisma.note.update({
