@@ -15,10 +15,6 @@ body {
   box-sizing: border-box;
 }
 
-.text-red-450 {
-  color: #f06332;
-}
-
 .markdown {
   line-height: 1.68;
   color: #3c4b62;
@@ -300,4 +296,16 @@ p.markdown {
 
 .btn-rounded {
   @apply rounded-full;
+}
+
+.btn-base {
+  cursor: pointer;
+}
+
+.btn-base:active {
+  filter: brightness(0.8);
+}
+
+.active:scale-20 {
+  transform: scale(1.2);
 }

@@ -21,7 +21,7 @@ export const curNoteIdState = atom<number | null>({
 })
 
 export const curNoteSelector = selector<Note | null>({
-  key: 'notesSelector',
+  key: 'curNotesSelector',
   get: ({ get }) => {
     const notes = get(noteStore)
     const curNoteId = get(curNoteIdState)
