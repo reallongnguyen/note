@@ -26,12 +26,17 @@ import './prismMarkdown'
 import Leaf from './Leaf'
 import RenderElement from './RenderElement'
 import { withImages, isImageUrl, insertImageAt } from './plugins'
-import { CustomText } from './customType'
+import { CustomElement, CustomText, ImageElement } from './customType'
 import { ImageOutline } from 'react-ionicons'
 
 const serializeNode = (node: Node): string => {
   if (Text.isText(node)) {
     return node.text
+  }
+
+  if ((node as CustomElement).type === 'image') {
+    const img = node as ImageElement
+    return `![${img.alt || ''}](${img.url})`
   }
 
   const children = node.children.map((n) => serializeNode(n)).join('')
@@ -45,10 +50,21 @@ const serialize = (node: Node[]): string => {
 
 const deserialize = (input: string): Descendant[] => {
   const lines = input.split('\n')
-  return lines.map((line) => ({
-    type: 'paragraph',
-    children: [{ text: line }],
-  }))
+  return lines.map((line) => {
+    const img = line.match(/^!\[([^\]]*)\]\(([^)]+)\)/)
+    if (img) {
+      return {
+        type: 'image',
+        url: img[2],
+        alt: img[1],
+        children: [{ text: '' }],
+      }
+    }
+    return {
+      type: 'paragraph',
+      children: [{ text: line }],
+    }
+  })
 }
 
 export interface Props {
@@ -106,6 +122,7 @@ const MarkdownPreview: FC<Props> = (props) => {
       }
 
       const broRanges = {}
+      let seenFirstSpace = false
 
       for (const t of tokens) {
         const len = getLength(t)
@@ -120,6 +137,11 @@ const MarkdownPreview: FC<Props> = (props) => {
             [t.type]: true,
             anchor: { path, offset: s },
             focus: { path, offset: e },
+          }
+
+          if (t.type === 'space' && !seenFirstSpace) {
+            range.firstSpace = true
+            seenFirstSpace = true
           }
 
           if (linkToken instanceof Token) {
@@ -185,6 +207,11 @@ const MarkdownPreview: FC<Props> = (props) => {
     if (selection && Range.isCollapsed(selection)) {
       const [start] = Range.edges(selection)
       const [node] = Editor.node(editor, start)
+
+      if ((node as CustomText).text === '# ') {
+        // Transforms.move(editor, { unit: 'line', edge: 'end' })
+        // Editor.insertText(editor, '-')
+      }
 
       if ((node as CustomText).text === '') {
         setEmptyLinePos(selection)

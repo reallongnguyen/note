@@ -32,6 +32,7 @@ export type HeadingThreeElement = {
 export type ImageElement = {
   type: 'image'
   url: string
+  alt?: string
   children: EmptyText[]
 }
 
@@ -92,6 +93,8 @@ export type CustomText = {
   h1?: boolean
   h2?: boolean
   h3?: boolean
+  space?: boolean
+  firstSpace?: boolean
   hr?: boolean
   blockquote?: boolean
   list?: boolean

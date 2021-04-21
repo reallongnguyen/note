@@ -38,20 +38,35 @@ const Leaf = ({
     return <em {...attributes}>{children}</em>
   }
 
+  if (leaf.firstSpace) {
+    return (
+      <span
+        {...attributes}
+        className={`
+        ml-[-0.35rem]
+        ${leaf.h1 && 'h1 ml-[-0.51rem]'}
+        ${leaf.h2 && 'h2 ml-[-0.45rem]'}
+        ${leaf.h3 && 'h3 ml-[-0.35rem]'}
+      `}
+      >
+        {children}
+      </span>
+    )
+  }
+
   if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
     return (
-      <div
+      <span
         className={`
-          float-left relative
-          ${leaf.h1 && 'h-[2.1rem]'}
-          ${leaf.h2 && 'h-[1.85rem]'}
-          ${leaf.h3 && 'h-[1.6rem]'}
+          relative bg-green-100
+          ${leaf.h1 && 'h1'}
+          ${leaf.h2 && 'h2'}
+          ${leaf.h3 && 'h3'}
         `}
         {...attributes}
       >
-        <span className="hidden">{children}</span>
         <span
-          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 select-none cursor-default"
+          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 cursor-default"
           onClick={changeHeading(leaf)}
           contentEditable={false}
         >
@@ -62,20 +77,33 @@ const Leaf = ({
             {leaf.h3 && '3'}
           </span>
         </span>
-      </div>
+        <span className="hidden">{children}</span>
+      </span>
     )
   }
 
   if (leaf.h1) {
-    return <h1 {...attributes}>{children}</h1>
+    return (
+      <span className="h1" {...attributes}>
+        {children}
+      </span>
+    )
   }
 
   if (leaf.h2) {
-    return <h2 {...attributes}>{children}</h2>
+    return (
+      <span className="h2" {...attributes}>
+        {children}
+      </span>
+    )
   }
 
   if (leaf.h3) {
-    return <h3 {...attributes}>{children}</h3>
+    return (
+      <span className="h3" {...attributes}>
+        {children}
+      </span>
+    )
   }
 
   if (leaf.hr) {
@@ -135,7 +163,7 @@ const Leaf = ({
       <span className="relative" {...attributes}>
         <span className="hidden">{children}</span>
         <span
-          className="absolute -left-4 text-red-450 font-bold select-none"
+          className="mr-2 text-red-450 font-bold select-none"
           contentEditable={false}
         >
           •
