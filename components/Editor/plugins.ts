@@ -1,7 +1,7 @@
 import { Editor, Location, Transforms } from 'slate'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { ImageElement } from './customType'
+import { CustomElement, ImageElement } from './customType'
 import { ReactEditor } from 'slate-react'
 
 export const isImageUrl = (url: string): boolean => {
@@ -37,10 +37,33 @@ export const insertImageAt = (
 }
 
 export const withImages = (editor: Editor): Editor => {
-  const { insertData, isVoid } = editor
+  const { insertData, isVoid, deleteBackward } = editor
 
   editor.isVoid = (element) => {
     return element.type === 'image' ? true : isVoid(element)
+  }
+
+  editor.deleteBackward = (unit) => {
+    const { selection } = editor
+
+    if (selection) {
+      const aboveLine = Editor.before(editor, selection, {
+        distance: 1,
+        unit: 'line',
+      })
+
+      // if current line have an above line
+      if (aboveLine) {
+        const [beforeNodeParent] = Editor.parent(editor, aboveLine)
+
+        if ((beforeNodeParent as CustomElement).type === 'image') {
+          Transforms.delete(editor, { at: selection })
+          return
+        }
+      }
+    }
+
+    deleteBackward(unit)
   }
 
   editor.insertData = (data) => {

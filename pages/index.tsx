@@ -13,7 +13,7 @@ export interface Props {
 export const Home: FC<Props> = ({ notes }) => (
   <div className="container">
     <Head>
-      <title>Note</title>
+      <title>isling - beta</title>
       <link rel="icon" href="/favicon.ico" />
     </Head>
 

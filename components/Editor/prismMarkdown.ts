@@ -13,22 +13,22 @@ Prism.languages.insertBefore('markdown', 'prolog', {
     },
   ],
   h1: {
-    pattern: /(^\s*)#(?!#)\s.+/m,
+    pattern: /(^\s*)#(?!#)\s.*/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#\s/ },
+    inside: { punctuation: /^#\s(?=\S)|#/ },
   },
   h2: {
-    pattern: /(^\s*)#{2}(?!#)\s.+/m,
+    pattern: /(^\s*)#{2}(?!#)\s.*/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#{2}\s/ },
+    inside: { punctuation: /^#{2}\s(?=\S)|#{2}/ },
   },
   h3: {
-    pattern: /(^\s*)#{3}(?!#)\s.+/m,
+    pattern: /(^\s*)#{3}(?!#)\s.*/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#{3}\s/ },
+    inside: { punctuation: /^#{3}\s(?=\S)|#{3}/ },
   },
   hr: {
     pattern: /(^\s*)([*-])([\t ]*\2){2,}(?=\s*$)/m,
@@ -36,11 +36,11 @@ Prism.languages.insertBefore('markdown', 'prolog', {
     alias: 'punctuation',
   },
   list: {
-    pattern: /(^\s*)(?:[*+-])\s.+/m,
+    pattern: /(^\s*)(?:[*+-])\s.*/m,
     lookbehind: !0,
     alias: 'important',
     inside: {
-      punctuation: /(^\s*)(?:[*+-])+\s/m,
+      punctuation: /(^\s*)(?:[*+-])+\s(?=\S)|(^\s*)(?:[*+-])+/m,
     },
   },
   code: [
@@ -54,9 +54,9 @@ Prism.languages.insertBefore('markdown', 'prolog', {
     },
   ],
   blockquote: {
-    pattern: /^>(?:[\t ]*>)*\s.+/m,
+    pattern: /^>(?:[\t ]*>)*\s.*/m,
     inside: {
-      punctuation: /^>(?:[\t ]*>)*\s/,
+      punctuation: /^>(?:[\t ]*>)*\s(?=\S)|>(?:[\t ]*>)*/,
     },
   },
   'url-reference': {

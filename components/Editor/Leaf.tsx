@@ -56,7 +56,7 @@ const Leaf = ({
 
   if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
     return (
-      <span
+      <div
         className={`
           relative bg-green-100
           ${leaf.h1 && 'h1'}
@@ -65,6 +65,14 @@ const Leaf = ({
         `}
         {...attributes}
       >
+        <span className="hidden">{children}</span>
+      </div>
+    )
+  }
+
+  if (leaf.h1) {
+    return (
+      <h1 {...attributes} className="relative">
         <span
           className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 cursor-default"
           onClick={changeHeading(leaf)}
@@ -77,32 +85,48 @@ const Leaf = ({
             {leaf.h3 && '3'}
           </span>
         </span>
-        <span className="hidden">{children}</span>
-      </span>
-    )
-  }
-
-  if (leaf.h1) {
-    return (
-      <span className="h1" {...attributes}>
         {children}
-      </span>
+      </h1>
     )
   }
 
   if (leaf.h2) {
     return (
-      <span className="h2" {...attributes}>
+      <h2 {...attributes} className="relative">
+        <span
+          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 cursor-default"
+          onClick={changeHeading(leaf)}
+          contentEditable={false}
+        >
+          H
+          <span className="text-xs">
+            {leaf.h1 && '1'}
+            {leaf.h2 && '2'}
+            {leaf.h3 && '3'}
+          </span>
+        </span>
         {children}
-      </span>
+      </h2>
     )
   }
 
   if (leaf.h3) {
     return (
-      <span className="h3" {...attributes}>
+      <h3 {...attributes} className="relative">
+        <span
+          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 cursor-default"
+          onClick={changeHeading(leaf)}
+          contentEditable={false}
+        >
+          H
+          <span className="text-xs">
+            {leaf.h1 && '1'}
+            {leaf.h2 && '2'}
+            {leaf.h3 && '3'}
+          </span>
+        </span>
         {children}
-      </span>
+      </h3>
     )
   }
 

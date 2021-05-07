@@ -8,6 +8,7 @@ import React, {
   FC,
   useEffect,
   useRef,
+  KeyboardEventHandler,
 } from 'react'
 import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import {
@@ -77,6 +78,7 @@ const MarkdownPreview: FC<Props> = (props) => {
   const [value, setValue] = useState<Descendant[]>(emptyValue)
   const [emptyLinePos, setEmptyLinePos] = useState<BaseRange>(null)
   const plusBtnRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const updateTimerId = useRef<NodeJS.Timeout>(null)
 
   const renderLeaf = useCallback(
@@ -108,7 +110,6 @@ const MarkdownPreview: FC<Props> = (props) => {
     }
 
     const tokens = Prism.tokenize(node.text, Prism.languages.markdown)
-    console.log('tokens', tokens)
 
     const decor = (start: number, tokens: (string | Token)[]) => {
       let s = start
@@ -117,12 +118,7 @@ const MarkdownPreview: FC<Props> = (props) => {
         (i) => i instanceof Token && i.type === 'link'
       )
 
-      if (linkToken) {
-        console.log('link token', linkToken)
-      }
-
       const broRanges = {}
-      let seenFirstSpace = false
 
       for (const t of tokens) {
         const len = getLength(t)
@@ -137,11 +133,6 @@ const MarkdownPreview: FC<Props> = (props) => {
             [t.type]: true,
             anchor: { path, offset: s },
             focus: { path, offset: e },
-          }
-
-          if (t.type === 'space' && !seenFirstSpace) {
-            range.firstSpace = true
-            seenFirstSpace = true
           }
 
           if (linkToken instanceof Token) {
@@ -170,8 +161,8 @@ const MarkdownPreview: FC<Props> = (props) => {
   }, [])
 
   const changeURL = (leaf: any) => () => {
-    Transforms.insertText(editor, 'long.me', { at: leaf.insideRanges.link })
-    Transforms.insertText(editor, 'long', { at: leaf.insideRanges.name })
+    Transforms.insertText(editor, '//isling.me', { at: leaf.insideRanges.link })
+    Transforms.insertText(editor, 'isling', { at: leaf.insideRanges.name })
   }
 
   const changeHeading = (leaf: any) => () => {
@@ -187,12 +178,17 @@ const MarkdownPreview: FC<Props> = (props) => {
   const addImage = () => {
     if (emptyLinePos) {
       const url = window.prompt('Enter the URL of the image:')
-      if (url && !isImageUrl(url)) {
-        alert('URL is not an image')
+      if (url === null) {
         return
       }
 
-      insertImageAt(editor, url, emptyLinePos)
+      if (url && isImageUrl(url)) {
+        insertImageAt(editor, url, emptyLinePos)
+        setEmptyLinePos(undefined)
+        return
+      }
+
+      alert(`URL '${url}' is not an image`)
     }
   }
 
@@ -208,12 +204,12 @@ const MarkdownPreview: FC<Props> = (props) => {
       const [start] = Range.edges(selection)
       const [node] = Editor.node(editor, start)
 
-      if ((node as CustomText).text === '# ') {
-        // Transforms.move(editor, { unit: 'line', edge: 'end' })
-        // Editor.insertText(editor, '-')
-      }
+      const [parentNode] = Editor.parent(editor, start)
 
-      if ((node as CustomText).text === '') {
+      if (
+        (node as CustomText).text === '' &&
+        (parentNode as CustomElement).type === 'paragraph'
+      ) {
         setEmptyLinePos(selection)
       } else {
         setEmptyLinePos(null)
@@ -230,8 +226,30 @@ const MarkdownPreview: FC<Props> = (props) => {
     console.log('updated', serialized)
   }
 
+  const handleKeyPress: KeyboardEventHandler = (e) => {
+    const { selection } = editor
+    if (selection && Range.isCollapsed(selection)) {
+      const [start] = Range.edges(selection)
+
+      const [parentNode] = Editor.parent(editor, start)
+
+      switch ((parentNode as CustomElement).type) {
+        case 'image':
+          if (e.code === 'Enter') {
+            e.preventDefault()
+            Transforms.insertNodes(editor, {
+              type: 'paragraph',
+              children: [{ text: '' }],
+            })
+          }
+          break
+      }
+    }
+  }
+
+  // plus button position
   useEffect(() => {
-    if (!emptyLinePos || !plusBtnRef.current) {
+    if (!emptyLinePos || !plusBtnRef.current || !scrollRef.current) {
       return
     }
     const ele = ReactEditor.toDOMRange(editor, emptyLinePos)
@@ -239,6 +257,21 @@ const MarkdownPreview: FC<Props> = (props) => {
 
     plusBtnRef.current.style.top = `calc(${rec.top}px)`
     plusBtnRef.current.style.left = `calc(${rec.left}px)`
+
+    const scrollTopOnInit = scrollRef.current.scrollTop
+    const handleScroll = () => {
+      const curScrollTop = scrollRef.current.scrollTop
+      const top = rec.top + scrollTopOnInit - curScrollTop
+      if (plusBtnRef.current) {
+        plusBtnRef.current.style.top = `calc(${top}px)`
+      }
+    }
+
+    scrollRef.current.addEventListener('scroll', handleScroll)
+
+    return () => {
+      scrollRef.current?.removeEventListener('scroll', handleScroll)
+    }
   }, [emptyLinePos])
 
   useEffect(() => {
@@ -263,16 +296,17 @@ const MarkdownPreview: FC<Props> = (props) => {
   }, [editor, props.contentId])
 
   return (
-    <div className="pt-6 h-full overflow-auto">
+    <div ref={scrollRef} className="pt-6 h-full overflow-auto">
       <div className="h-full px-16 markdown">
         <Slate editor={editor} value={value} onChange={handleChangeValue}>
           <Editable
             decorate={decorate}
             renderLeaf={renderLeaf}
             renderElement={renderElement}
+            onKeyPress={handleKeyPress}
           />
           {emptyLinePos && (
-            <div ref={plusBtnRef} className="fixed">
+            <div ref={plusBtnRef} className="absolute">
               <div
                 className="cursor-pointer w-8 h-8 flex justify-center items-center -translate-y-2 -translate-x-10 transform btn btn-rounded"
                 onClick={addImage}

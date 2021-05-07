@@ -28,7 +28,7 @@ const NotePreview: FC<NotePreviewProps> = ({
   return (
     <div className="grid w-full" style={{ gridTemplateColumns: '1fr auto' }}>
       <div
-        className="border-b border-gray-200 p-2 pl-4 h-20"
+        className="border-b border-gray-200 p-2 pl-0 ml-5 h-20"
         onClick={selectNote}
       >
         <div className="mb-1 text-gray-700 w-56">
@@ -54,7 +54,7 @@ const NotePreview: FC<NotePreviewProps> = ({
       </div>
       <div className="border-b border-gray-200 hover:border-red-450 w-12">
         <div
-          className="flex h-full items-center justify-center text-gray-400 hover:bg-red-450 hover:text-gray-50 transition-colors duration-100 btn-base"
+          className="flex h-full items-center justify-center text-gray-300 hover:bg-red-450 hover:text-gray-50 transition-colors duration-100 btn-base"
           onClick={handleDeleteNote}
         >
           <TrashOutline style={{ color: 'inherit' }} width="1.2rem" />
