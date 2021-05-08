@@ -93,11 +93,11 @@ export type CustomText = {
   h1?: boolean
   h2?: boolean
   h3?: boolean
-  space?: boolean
   firstSpace?: boolean
   hr?: boolean
   blockquote?: boolean
   list?: boolean
+  task?: boolean
 }
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor

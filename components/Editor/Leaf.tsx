@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { LinkOutline } from 'react-ionicons'
+import { CheckboxOutline, LinkOutline, SquareOutline } from 'react-ionicons'
 import { RenderLeafProps } from 'slate-react'
 import { CustomText } from './customType'
 
@@ -11,6 +11,7 @@ const Leaf = ({
   leaf,
   changeURL,
   changeHeading,
+  changeTaskStatus,
 }: RenderLeafProps & CustomFunc): JSX.Element => {
   console.log('leaf', leaf)
 
@@ -56,17 +57,9 @@ const Leaf = ({
 
   if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
     return (
-      <div
-        className={`
-          relative bg-green-100
-          ${leaf.h1 && 'h1'}
-          ${leaf.h2 && 'h2'}
-          ${leaf.h3 && 'h3'}
-        `}
-        {...attributes}
-      >
-        <span className="hidden">{children}</span>
-      </div>
+      <span className="hidden float-left" {...attributes}>
+        {children}
+      </span>
     )
   }
 
@@ -74,17 +67,10 @@ const Leaf = ({
     return (
       <h1 {...attributes} className="relative">
         <span
-          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 cursor-default"
+          className="absolute -left-6 bottom-0 cursor-pointer h1-btn"
           onClick={changeHeading(leaf)}
           contentEditable={false}
-        >
-          H
-          <span className="text-xs">
-            {leaf.h1 && '1'}
-            {leaf.h2 && '2'}
-            {leaf.h3 && '3'}
-          </span>
-        </span>
+        />
         {children}
       </h1>
     )
@@ -94,17 +80,10 @@ const Leaf = ({
     return (
       <h2 {...attributes} className="relative">
         <span
-          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 cursor-default"
+          className="absolute -left-6 bottom-0 cursor-pointer h2-btn"
           onClick={changeHeading(leaf)}
           contentEditable={false}
-        >
-          H
-          <span className="text-xs">
-            {leaf.h1 && '1'}
-            {leaf.h2 && '2'}
-            {leaf.h3 && '3'}
-          </span>
-        </span>
+        />
         {children}
       </h2>
     )
@@ -114,17 +93,10 @@ const Leaf = ({
     return (
       <h3 {...attributes} className="relative">
         <span
-          className="absolute -left-6 text-sm font-sans text-gray-300 bottom-0 cursor-default"
+          className="absolute -left-6 bottom-0 cursor-pointer h3-btn"
           onClick={changeHeading(leaf)}
           contentEditable={false}
-        >
-          H
-          <span className="text-xs">
-            {leaf.h1 && '1'}
-            {leaf.h2 && '2'}
-            {leaf.h3 && '3'}
-          </span>
-        </span>
+        />
         {children}
       </h3>
     )
@@ -157,7 +129,6 @@ const Leaf = ({
         <a
           className="text-red-450"
           href={leaf.href}
-          target="_blank"
           rel="noreferrer"
           onClick={(e) => {
             e.preventDefault()
@@ -184,20 +155,55 @@ const Leaf = ({
 
   if (leaf.list && leaf.punctuation) {
     return (
-      <span className="relative" {...attributes}>
-        <span className="hidden">{children}</span>
-        <span
-          className="mr-2 text-red-450 font-bold select-none"
-          contentEditable={false}
-        >
-          •
-        </span>
+      <span className="hidden" {...attributes}>
+        {children}
       </span>
     )
   }
 
   if (leaf.list) {
-    return <span {...attributes}>{children}</span>
+    return (
+      <span className="li" {...attributes}>
+        {children}
+      </span>
+    )
+  }
+
+  if (leaf.task && leaf.punctuation) {
+    const isDone = leaf.text.startsWith('[x]')
+
+    return (
+      <span {...attributes}>
+        <span className="hidden">{children}</span>
+        <span
+          className={`
+            pr-2 mt-[0.4rem] font-bold select-none cursor-pointer
+            ${
+              isDone
+                ? 'text-green-500 hover:text-green-600'
+                : 'text-gray-400 hover:text-gray-500'
+            }
+          `}
+          contentEditable={false}
+          onClick={changeTaskStatus(leaf)}
+        >
+          {isDone && (
+            <CheckboxOutline
+              style={{ color: 'inherit' }}
+              width="1.2rem"
+              cssClasses="-mt-1 inline"
+            />
+          )}
+          {!isDone && (
+            <SquareOutline
+              style={{ color: 'inherit' }}
+              width="1.2rem"
+              cssClasses="-mt-1 inline"
+            />
+          )}
+        </span>
+      </span>
+    )
   }
 
   return <span {...attributes}>{children}</span>

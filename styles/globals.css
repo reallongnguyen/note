@@ -57,16 +57,34 @@ body {
   @apply text-lg;
 }
 
+.markdown .h1-btn:before {
+  content: 'H1';
+  display: inline;
+  @apply text-xs font-sans text-gray-300;
+}
+
+.markdown .h2-btn:before {
+  content: 'H2';
+  display: inline;
+  @apply text-xs font-sans text-gray-300;
+}
+
+.markdown .h3-btn:before {
+  content: 'H3';
+  display: inline;
+  @apply text-xs font-sans text-gray-300;
+}
+
 .markdown ul:not(.medium-insert-buttons-addons) {
   list-style: none;
   padding-left: 24px;
 }
 
-.markdown ul:not(.medium-insert-buttons-addons) > li:before {
-  content: '- ';
-  margin-left: -18px;
+.markdown .li:before {
+  content: '•';
   display: inline;
   float: left;
+  @apply mr-2 text-red-450 font-extrabold;
 }
 
 .markdown ul:not(.medium-insert-buttons-addons) > li > ul > li:before {

@@ -13,8 +13,8 @@ export interface Props {
 export const Home: FC<Props> = ({ notes }) => (
   <div className="container">
     <Head>
-      <title>isling - beta</title>
-      <link rel="icon" href="/favicon.ico" />
+      <title>Isling: Markdown Notebook</title>
+      <link rel="icon" href="/favicon.png" />
     </Head>
 
     <main spellCheck={false}>

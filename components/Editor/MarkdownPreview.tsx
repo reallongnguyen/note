@@ -83,7 +83,12 @@ const MarkdownPreview: FC<Props> = (props) => {
 
   const renderLeaf = useCallback(
     (props) => (
-      <Leaf {...props} changeURL={changeURL} changeHeading={changeHeading} />
+      <Leaf
+        {...props}
+        changeURL={changeURL}
+        changeHeading={changeHeading}
+        changeTaskStatus={changeTaskStatus}
+      />
     ),
     []
   )
@@ -160,12 +165,32 @@ const MarkdownPreview: FC<Props> = (props) => {
     return ranges
   }, [])
 
-  const changeURL = (leaf: any) => () => {
+  const changeURL = (leaf: any) => (e: MouseEvent) => {
+    e.preventDefault()
     Transforms.insertText(editor, '//isling.me', { at: leaf.insideRanges.link })
     Transforms.insertText(editor, 'isling', { at: leaf.insideRanges.name })
   }
 
-  const changeHeading = (leaf: any) => () => {
+  const changeTaskStatus = (leaf: any) => (e: MouseEvent) => {
+    e.preventDefault()
+    const isDone = leaf.text.startsWith('[x]')
+    let checkboxText = leaf.text // [] or [x]
+
+    // switch task status between [] and [x]
+    if (isDone) {
+      checkboxText = checkboxText.replace('[x]', '[]')
+    } else {
+      checkboxText = checkboxText.replace('[]', '[x]')
+    }
+
+    Transforms.insertText(editor, checkboxText, {
+      at: leaf.insideRanges.punctuation,
+    })
+    Transforms.deselect(editor)
+  }
+
+  const changeHeading = (leaf: any) => (e: MouseEvent) => {
+    e.preventDefault()
     const range = leaf.insideRanges.punctuation
     const length = range.focus.offset - range.anchor.offset - 1
     const heading = '#'.repeat(length < 3 ? length + 1 : 1)
@@ -173,6 +198,7 @@ const MarkdownPreview: FC<Props> = (props) => {
     Transforms.insertText(editor, `${heading} `, {
       at: leaf.insideRanges.punctuation,
     })
+    Transforms.deselect(editor)
   }
 
   const addImage = () => {

@@ -6,14 +6,13 @@ const Image = ({ attributes, children, element }) => {
 
   return (
     <div {...attributes}>
-      <div contentEditable={false}>
-        <img
-          src={element.url}
-          className={`block w-full ${
-            selected && focused && 'element-selected'
-          }`}
-        />
-      </div>
+      <img
+        src={element.url}
+        className={`block w-full select-none ${
+          selected && focused && 'element-selected'
+        }`}
+        contentEditable={false}
+      />
       {children}
     </div>
   )

@@ -43,6 +43,14 @@ Prism.languages.insertBefore('markdown', 'prolog', {
       punctuation: /(^\s*)(?:[*+-])+\s(?=\S)|(^\s*)(?:[*+-])+/m,
     },
   },
+  task: {
+    pattern: /(^\s*)(?:\[[x]?\])\s.*/m,
+    lookbehind: !0,
+    alias: 'important',
+    inside: {
+      punctuation: /(^\s*)(?:\[[x]?\])\s(?=\S)|(^\s*)(?:\[[x]?\])/m,
+    },
+  },
   code: [
     {
       pattern: /``.+?``|`[^`\n]+`/,
@@ -124,6 +132,23 @@ Prism.languages.insertBefore('markdown', 'prolog', {
 )
 ;(Prism.languages.markdown.list as TokenObject).inside.bold = Prism.util.clone(
   Prism.languages.markdown.bold
+)
+;(Prism.languages.markdown
+  .list as TokenObject).inside.italic = Prism.util.clone(
+  Prism.languages.markdown.italic
+)
+;(Prism.languages.markdown.task as TokenObject).inside.url = Prism.util.clone(
+  Prism.languages.markdown.url
+)
+;(Prism.languages.markdown.task as TokenObject).inside.code = Prism.util.clone(
+  Prism.languages.markdown.code
+)
+;(Prism.languages.markdown.task as TokenObject).inside.bold = Prism.util.clone(
+  Prism.languages.markdown.bold
+)
+;(Prism.languages.markdown
+  .task as TokenObject).inside.italic = Prism.util.clone(
+  Prism.languages.markdown.italic
 )
 ;(Prism.languages.markdown
   .blockquote as TokenObject).inside.url = Prism.util.clone(
