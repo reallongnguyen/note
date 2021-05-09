@@ -40,21 +40,36 @@ body {
 .markdown h2,
 .h2 {
   color: #1a202c;
-  font-weight: 400;
+  font-weight: 500;
   @apply text-2xl;
 }
 
 .markdown h3,
 .h3 {
   color: #1a202c;
-  font-weight: 400;
-  @apply text-xl;
+  font-weight: 500;
+  @apply text-lg;
 }
 
 .markdown .h4 {
   color: #1a202c;
-  font-weight: 400;
-  @apply text-lg;
+  font-weight: 500;
+  @apply text-base;
+}
+
+.markdown h1,
+.h1 {
+  @apply mb-4;
+}
+
+.markdown h2,
+.h2 {
+  @apply mt-8;
+}
+
+.markdown h3,
+.h3 {
+  @apply mt-4;
 }
 
 .markdown .h1-btn:before {
@@ -97,21 +112,6 @@ body {
   margin-top: 8px;
   padding-left: 10px;
   line-height: 24px;
-}
-
-.markdown h1,
-.h1 {
-  margin-bottom: 1rem;
-}
-
-.markdown h2,
-.h2 {
-  margin-top: 2rem;
-}
-
-.markdown h3,
-.h3 {
-  margin-top: 1.5rem;
 }
 
 /* .markdown h1::before {

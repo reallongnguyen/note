@@ -52,9 +52,9 @@ const NotePreview: FC<NotePreviewProps> = ({
           )}
         </div>
       </div>
-      <div className="border-b border-gray-200 hover:border-red-450 w-12">
+      <div className="w-10 right-0 top-0 h-full flex justify-center items-center">
         <div
-          className="flex h-full items-center justify-center text-gray-300 hover:bg-red-450 hover:text-gray-50 transition-colors duration-100 btn-base"
+          className="flex h-full w-full items-center justify-center bg-gray-50 bg-opacity-80 text-gray-300 hover:bg-red-450 hover:text-gray-50 border-b border-gray-200 hover:border-red-450 transition-colors duration-75 btn-base"
           onClick={handleDeleteNote}
         >
           <TrashOutline style={{ color: 'inherit' }} width="1.2rem" />

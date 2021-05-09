@@ -186,7 +186,11 @@ const MarkdownPreview: FC<Props> = (props) => {
     Transforms.insertText(editor, checkboxText, {
       at: leaf.insideRanges.punctuation,
     })
-    Transforms.deselect(editor)
+    const endOfLine = Editor.after(editor, leaf.insideRanges.punctuation, {
+      unit: 'line',
+      distance: 1,
+    })
+    Transforms.select(editor, endOfLine)
   }
 
   const changeHeading = (leaf: any) => (e: MouseEvent) => {
@@ -198,7 +202,11 @@ const MarkdownPreview: FC<Props> = (props) => {
     Transforms.insertText(editor, `${heading} `, {
       at: leaf.insideRanges.punctuation,
     })
-    Transforms.deselect(editor)
+    const endOfLine = Editor.after(editor, leaf.insideRanges.punctuation, {
+      unit: 'line',
+      distance: 1,
+    })
+    Transforms.select(editor, endOfLine)
   }
 
   const addImage = () => {
