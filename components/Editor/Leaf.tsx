@@ -143,9 +143,18 @@ const Leaf = ({
 
   if (leaf.blockquote && leaf.punctuation) {
     return (
-      <div className="float-left blockquote w-0" {...attributes}>
-        <span className="invisible">{children}</span>
-      </div>
+      <span
+        ref={(ref) => {
+          if (!ref) {
+            return
+          }
+          ref.parentNode.parentElement.className = 'blockquote'
+        }}
+        className="hidden"
+        {...attributes}
+      >
+        {children}
+      </span>
     )
   }
 
@@ -155,18 +164,14 @@ const Leaf = ({
 
   if (leaf.list && leaf.punctuation) {
     return (
-      <span className="hidden" {...attributes}>
-        {children}
+      <span className="li" {...attributes}>
+        <span className="hidden">{children}</span>
       </span>
     )
   }
 
   if (leaf.list) {
-    return (
-      <span className="li" {...attributes}>
-        {children}
-      </span>
-    )
+    return <span {...attributes}>{children}</span>
   }
 
   if (leaf.task && leaf.punctuation) {
