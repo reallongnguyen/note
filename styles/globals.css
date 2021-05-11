@@ -333,3 +333,11 @@ p.markdown {
 .active:scale-20 {
   transform: scale(1.2);
 }
+
+#search-input {
+  margin-left: calc(50% - 60px);
+}
+
+#search-input:focus {
+  margin-left: 0;
+}

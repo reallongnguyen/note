@@ -1,7 +1,19 @@
 import { Note } from '@prisma/client'
 import axios from 'axios'
-import { FC, useEffect, useMemo, useState } from 'react'
-import { AddOutline, SearchOutline, TrashOutline } from 'react-ionicons'
+import {
+  FC,
+  useEffect,
+  useMemo,
+  useState,
+  ChangeEventHandler,
+  useRef,
+} from 'react'
+import {
+  AddOutline,
+  SearchOutline,
+  TrashOutline,
+  CloseCircle,
+} from 'react-ionicons'
 import { useRecoilState } from 'recoil'
 import { curNoteIdState, noteStore } from '../../store/notes'
 
@@ -72,6 +84,9 @@ const SideBar: FC<Props> = (props) => {
   const [noteIds, setNoteIds] = useState<number[]>([])
   const [curNoteId, setCurNoteId] = useRecoilState(curNoteIdState)
   const [allNotes, setAllNotes] = useRecoilState(noteStore)
+  const [deleteButtonState, setDeleteButtonState] = useState<string>('hidden')
+  const [keyword, setKeyword] = useState<string>('')
+  const timeout = useRef<NodeJS.Timeout>(null)
 
   const notes = useMemo(() => {
     return noteIds.filter((id) => allNotes[id]).map((id) => allNotes[id])
@@ -122,15 +137,68 @@ const SideBar: FC<Props> = (props) => {
     }
   }, [])
 
+  const handleSearch = () => {
+    setDeleteButtonState('')
+  }
+
+  const blurSearch = () => {
+    setDeleteButtonState('hidden')
+    // update note lists
+  }
+
+  const deleteKey = () => {
+    setKeyword('')
+    // update note lists
+    setDeleteButtonState('hidden')
+  }
+
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const keyword_str = e.target.value
+    const apiUrl = keyword_str
+      ? `/api/notes/search/${keyword_str}`
+      : `/api/notes`
+    clearTimeout(timeout.current)
+    setKeyword(keyword_str)
+    timeout.current = setTimeout(async () => {
+      const res = await axios.get(apiUrl)
+      const ids = res.data.data.items.map((n) => n.id)
+      setNoteIds(ids)
+    }, 1000)
+  }
+
   return (
     <div
       className="grid grid-flow-row h-full"
       style={{ gridTemplateRows: 'auto 1fr' }}
     >
       <div className="h-12 border-b border-gray-200 flex items-center justify-evenly">
-        <div className="w-9/12 h-6 rounded border border-gray-300 flex items-center justify-center text-gray-400 text-sm cursor-text">
-          <SearchOutline style={{ color: 'inherit' }} width="1.1rem" />
-          <div className="ml-1">Search Notes</div>
+        <div
+          className="w-9/12 h-6 px-1 rounded border border-gray-300 flex items-center justify-center text-gray-400 text-sm cursor-text relative"
+          onFocus={handleSearch}
+          onBlur={blurSearch}
+        >
+          <div className="w-full h-full flex items-center">
+            <SearchOutline
+              cssClasses="mr-1"
+              style={{ color: 'inherit' }}
+              width="1.1rem"
+            />
+            <input
+              className="w-full transition-all duration-500 ease-out text-left flex-grow outline-none"
+              type="text"
+              id="search-input"
+              placeholder="Search Notes"
+              value={keyword}
+              onChange={handleChange}
+            ></input>
+          </div>
+          <button onClick={deleteKey}>
+            <CloseCircle
+              cssClasses={`absolute cursor-pointer ${deleteButtonState}`}
+              style={{ color: '#1c0202', right: '0.1rem', top: '0' }}
+              width="1.1rem"
+            />
+          </button>
         </div>
         <button
           className="h-6 w-6 flex items-center justify-center btn-rounded btn"
