@@ -57,7 +57,16 @@ const Leaf = ({
 
   if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
     return (
-      <span className="hidden float-left" {...attributes}>
+      <span
+        ref={(ref) => {
+          if (!ref) {
+            return
+          }
+          ref.parentNode.parentElement.className = 'heading'
+        }}
+        className="hidden float-left"
+        {...attributes}
+      >
         {children}
       </span>
     )
@@ -104,7 +113,16 @@ const Leaf = ({
 
   if (leaf.hr) {
     return (
-      <span className="text-center" {...attributes}>
+      <span
+        ref={(ref) => {
+          if (!ref) {
+            return
+          }
+          ref.parentNode.parentElement.className = 'hr'
+        }}
+        className="text-center"
+        {...attributes}
+      >
         <span className="hidden">{children}</span>
         <hr contentEditable={false} className="select-none" />
       </span>
@@ -148,7 +166,7 @@ const Leaf = ({
           if (!ref) {
             return
           }
-          ref.parentNode.parentElement.className = 'blockquote'
+          ref.parentNode.parentElement.className = 'blockquote paragraph'
         }}
         className="hidden"
         {...attributes}
@@ -171,14 +189,34 @@ const Leaf = ({
   }
 
   if (leaf.list) {
-    return <span {...attributes}>{children}</span>
+    return (
+      <span
+        ref={(ref) => {
+          if (!ref) {
+            return
+          }
+          ref.parentNode.parentElement.className = 'list'
+        }}
+        {...attributes}
+      >
+        {children}
+      </span>
+    )
   }
 
   if (leaf.task && leaf.punctuation) {
     const isDone = leaf.text.startsWith('[x]')
 
     return (
-      <span {...attributes}>
+      <span
+        ref={(ref) => {
+          if (!ref) {
+            return
+          }
+          ref.parentNode.parentElement.className = 'list'
+        }}
+        {...attributes}
+      >
         <span className="hidden">{children}</span>
         <span
           className={`
@@ -211,7 +249,21 @@ const Leaf = ({
     )
   }
 
-  return <span {...attributes}>{children}</span>
+  return (
+    <span
+      ref={(ref) => {
+        if (!ref) {
+          return
+        }
+        if (!ref.parentNode.parentElement.className) {
+          ref.parentNode.parentElement.className = 'paragraph'
+        }
+      }}
+      {...attributes}
+    >
+      {children}
+    </span>
+  )
 }
 
 export default Leaf

@@ -39,9 +39,9 @@ const NotePreview: FC<NotePreviewProps> = ({
   }
 
   return (
-    <div className="grid w-full" style={{ gridTemplateColumns: '1fr auto' }}>
+    <div className="grid" style={{ gridTemplateColumns: '1fr auto' }}>
       <div
-        className="border-b border-gray-200 p-2 pl-0 ml-5 h-20"
+        className="p-2 pl-0 ml-5 h-20 border-b border-gray-200"
         onClick={selectNote}
       >
         <div className="mb-1 text-gray-700 w-56">
@@ -202,9 +202,9 @@ const SideBar: FC<Props> = (props) => {
       className="grid grid-flow-row h-full"
       style={{ gridTemplateRows: 'auto 1fr' }}
     >
-      <div className="h-12 border-b border-gray-200 flex items-center justify-evenly">
+      <div className="h-12 border-b flex items-center justify-evenly">
         <div
-          className="w-9/12 h-6 px-1 rounded border border-gray-300 flex items-center justify-center text-gray-400 text-sm cursor-text relative"
+          className="w-9/12 h-6 px-2 rounded border border-gray-300 flex items-center justify-center text-gray-400 text-sm cursor-text relative"
           onFocus={handleSearch}
           onBlur={blurSearch}
           onClick={handleSelectSearchWrapper}
@@ -255,9 +255,10 @@ const SideBar: FC<Props> = (props) => {
         {notes.map((note) => (
           <div key={note.id} className="relative cursor-pointer">
             {curNoteId === note.id && (
-              <div className="absolute top-0 left-0 bg-red-400 w-1 h-full"></div>
+              <div className="absolute top-0 left-0 bg-red-400 w-1 rounded h-full"></div>
             )}
             <NotePreview
+              key={note.id}
               note={note}
               selectNote={() => setCurNoteId(note.id)}
               deleteNote={() => deleteNote(note)}

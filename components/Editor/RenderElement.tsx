@@ -5,7 +5,7 @@ const Image = ({ attributes, children, element }) => {
   const focused = useFocused()
 
   return (
-    <div {...attributes}>
+    <div className="paragraph" {...attributes}>
       <img
         src={element.url}
         className={`block w-full select-none ${
