@@ -334,10 +334,6 @@ p.markdown {
   transform: scale(1.2);
 }
 
-#search-input {
-  margin-left: calc(50% - 60px);
-}
-
-#search-input:focus {
-  margin-left: 0;
+.p-l-haft {
+  padding-left: calc(50% - 56px);
 }

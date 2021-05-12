@@ -7,12 +7,13 @@ import {
   useState,
   ChangeEventHandler,
   useRef,
+  MouseEventHandler,
 } from 'react'
 import {
   AddOutline,
   SearchOutline,
   TrashOutline,
-  CloseCircle,
+  CloseOutline,
 } from 'react-ionicons'
 import { useRecoilState } from 'recoil'
 import { curNoteIdState, noteStore } from '../../store/notes'
@@ -87,6 +88,7 @@ const SideBar: FC<Props> = (props) => {
   const [deleteButtonState, setDeleteButtonState] = useState<string>('hidden')
   const [keyword, setKeyword] = useState<string>('')
   const timeout = useRef<NodeJS.Timeout>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const notes = useMemo(() => {
     return noteIds.filter((id) => allNotes[id]).map((id) => allNotes[id])
@@ -125,6 +127,64 @@ const SideBar: FC<Props> = (props) => {
     })
   }
 
+  const handleSearch = () => {
+    setDeleteButtonState('')
+  }
+
+  const handleSelectSearchWrapper = () => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }
+
+  const blurSearch = () => {
+    setDeleteButtonState('hidden')
+    // update note lists
+  }
+
+  const deleteKey: MouseEventHandler = (e) => {
+    e.preventDefault()
+    setKeyword('')
+    // update note lists
+    setDeleteButtonState('hidden')
+  }
+
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setKeyword(e.target.value)
+  }
+
+  useEffect(() => {
+    clearTimeout(timeout.current)
+
+    const fetchNotesAPI = keyword
+      ? `/api/notes/search/${keyword}`
+      : '/api/notes'
+    const fetchManyNotes = async (url: string) => {
+      const res = await axios.get(url)
+      const ids = res.data.data.items.map((n: Note) => n.id)
+      setNoteIds(ids)
+      setAllNotes((noteStore) => {
+        const clone = { ...noteStore }
+        res.data.data.items.forEach((n: Note) => {
+          clone[n.id] = n
+        })
+
+        return clone
+      })
+    }
+
+    // fetch all notes
+    if (!keyword) {
+      fetchManyNotes(fetchNotesAPI)
+      return
+    }
+
+    // fetch notes relate keyword
+    timeout.current = setTimeout(async () => {
+      fetchManyNotes(fetchNotesAPI)
+    }, 400)
+  }, [keyword])
+
   useEffect(() => {
     const noteMap: Record<number, Note> = {}
     props.notes.forEach((note) => {
@@ -137,35 +197,6 @@ const SideBar: FC<Props> = (props) => {
     }
   }, [])
 
-  const handleSearch = () => {
-    setDeleteButtonState('')
-  }
-
-  const blurSearch = () => {
-    setDeleteButtonState('hidden')
-    // update note lists
-  }
-
-  const deleteKey = () => {
-    setKeyword('')
-    // update note lists
-    setDeleteButtonState('hidden')
-  }
-
-  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    const keyword_str = e.target.value
-    const apiUrl = keyword_str
-      ? `/api/notes/search/${keyword_str}`
-      : `/api/notes`
-    clearTimeout(timeout.current)
-    setKeyword(keyword_str)
-    timeout.current = setTimeout(async () => {
-      const res = await axios.get(apiUrl)
-      const ids = res.data.data.items.map((n) => n.id)
-      setNoteIds(ids)
-    }, 1000)
-  }
-
   return (
     <div
       className="grid grid-flow-row h-full"
@@ -176,35 +207,48 @@ const SideBar: FC<Props> = (props) => {
           className="w-9/12 h-6 px-1 rounded border border-gray-300 flex items-center justify-center text-gray-400 text-sm cursor-text relative"
           onFocus={handleSearch}
           onBlur={blurSearch}
+          onClick={handleSelectSearchWrapper}
         >
-          <div className="w-full h-full flex items-center">
+          <div
+            className={`
+            h-full w-full flex items-center transition-all duration-500 ease-out focus-within:pl-0
+            ${keyword ? 'pl-0' : 'p-l-haft'}
+          `}
+          >
             <SearchOutline
-              cssClasses="mr-1"
+              cssClasses="mr-2"
               style={{ color: 'inherit' }}
               width="1.1rem"
             />
             <input
-              className="w-full transition-all duration-500 ease-out text-left flex-grow outline-none"
+              ref={searchInputRef}
+              className="flex-grow text-left outline-none bg-transparent"
               type="text"
               id="search-input"
               placeholder="Search Notes"
               value={keyword}
               onChange={handleChange}
-            ></input>
-          </div>
-          <button onClick={deleteKey}>
-            <CloseCircle
-              cssClasses={`absolute cursor-pointer ${deleteButtonState}`}
-              style={{ color: '#1c0202', right: '0.1rem', top: '0' }}
-              width="1.1rem"
             />
-          </button>
+            <button
+              onClick={deleteKey}
+              className="text-gray-400 right-1 absolute outline-none focus:outline-none active:outline-none"
+            >
+              {keyword && (
+                <CloseOutline
+                  color="rgb(156, 163, 175)"
+                  cssClasses={`cursor-pointer ${deleteButtonState}`}
+                  style={{ color: 'inherit' }}
+                  width="1.1rem"
+                />
+              )}
+            </button>
+          </div>
         </div>
         <button
           className="h-6 w-6 flex items-center justify-center btn-rounded btn"
           onClick={addNote}
         >
-          <AddOutline style={{ color: 'inherit' }} width="1.2rem" />
+          <AddOutline style={{ color: 'inherit' }} width="1.1rem" />
         </button>
       </div>
       <div className="overflow-y-auto">
