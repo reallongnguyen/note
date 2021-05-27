@@ -16,41 +16,57 @@ Prism.languages.insertBefore('markdown', 'prolog', {
     pattern: /(^\s*)#(?!#)\s.*/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#\s(?=\S)|#/ },
+    inside: { punctuation: /^#/ },
   },
   h2: {
     pattern: /(^\s*)#{2}(?!#)\s.*/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#{2}\s(?=\S)|#{2}/ },
+    inside: { punctuation: /^#{2}/ },
   },
   h3: {
     pattern: /(^\s*)#{3}(?!#)\s.*/m,
     lookbehind: !0,
     alias: 'important',
-    inside: { punctuation: /^#{3}\s(?=\S)|#{3}/ },
+    inside: { punctuation: /^#{3}/ },
   },
   hr: {
     pattern: /(^\s*)([*-])([\t ]*\2){2,}(?=\s*$)/m,
     lookbehind: !0,
     alias: 'punctuation',
   },
-  list: {
-    pattern: /(^\s*)(?:[*+-])\s.*/m,
-    lookbehind: !0,
-    alias: 'important',
-    inside: {
-      punctuation: {
-        pattern: /^\s*(?:[*+-])\s(?=\S)|^\s*(?:[*+-])/m,
+  list: [
+    {
+      pattern: /^\s*-\s.*/m,
+      inside: {
+        punctuation: {
+          pattern: /^\s*-/,
+        },
       },
     },
-  },
+    {
+      pattern: /^\s*\*\s.*/m,
+      inside: {
+        punctuation: {
+          pattern: /^\s*\*/m,
+        },
+      },
+    },
+    {
+      pattern: /^\s*\+\s.*/m,
+      inside: {
+        punctuation: {
+          pattern: /^\s*\+/m,
+        },
+      },
+    },
+  ],
   task: {
     pattern: /(^\s*)(?:\[[x]?\])\s.*/m,
     lookbehind: !0,
     alias: 'important',
     inside: {
-      punctuation: /(^\s*)(?:\[[x]?\])\s(?=\S)|(^\s*)(?:\[[x]?\])/m,
+      punctuation: /(^\s*)(?:\[[x]?\])/m,
     },
   },
   code: [
@@ -66,7 +82,7 @@ Prism.languages.insertBefore('markdown', 'prolog', {
   blockquote: {
     pattern: /^>(?:[\t ]*>)*\s.*/m,
     inside: {
-      punctuation: /^>(?:[\t ]*>)*\s(?=\S)|>(?:[\t ]*>)*/,
+      punctuation: /^>(?:[\t ]*>)*/,
     },
   },
   'url-reference': {
@@ -122,19 +138,12 @@ Prism.languages.insertBefore('markdown', 'prolog', {
   .italic as TokenObject).inside.bold = Prism.util.clone(
   Prism.languages.markdown.bold
 )
-;(Prism.languages.markdown.list as TokenObject).inside.url = Prism.util.clone(
-  Prism.languages.markdown.url
-)
-;(Prism.languages.markdown.list as TokenObject).inside.code = Prism.util.clone(
-  Prism.languages.markdown.code
-)
-;(Prism.languages.markdown.list as TokenObject).inside.bold = Prism.util.clone(
-  Prism.languages.markdown.bold
-)
-;(Prism.languages.markdown
-  .list as TokenObject).inside.italic = Prism.util.clone(
-  Prism.languages.markdown.italic
-)
+;(Prism.languages.markdown.list as TokenObject[]).forEach((l) => {
+  l.inside.url = Prism.util.clone(Prism.languages.markdown.url)
+  l.inside.code = Prism.util.clone(Prism.languages.markdown.code)
+  l.inside.bold = Prism.util.clone(Prism.languages.markdown.bold)
+  l.inside.italic = Prism.util.clone(Prism.languages.markdown.italic)
+})
 ;(Prism.languages.markdown.task as TokenObject).inside.url = Prism.util.clone(
   Prism.languages.markdown.url
 )

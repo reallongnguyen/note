@@ -324,10 +324,36 @@ p.markdown {
   filter: brightness(0.8);
 }
 
+.btn-base:focus,
+.btn-base:hover {
+  @apply outline-none;
+}
+
 .active:scale-20 {
   transform: scale(1.2);
 }
 
 .p-l-haft {
   padding-left: calc(50% - 56px);
+}
+
+input {
+  @apply font-light outline-none;
+}
+
+.input {
+  @apply outline-none;
+}
+
+.primary {
+  @apply border-gray-200 rounded-sm border;
+}
+
+.primary:focus-within,
+.primary:hover {
+  @apply border-blue-300;
+}
+
+.label {
+  @apply mb-1;
 }

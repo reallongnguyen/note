@@ -57,7 +57,7 @@ const Leaf = ({
 
   if (leaf.punctuation && (leaf.h1 || leaf.h2 || leaf.h3)) {
     return (
-      <span
+      <div
         ref={(ref) => {
           if (!ref) {
             return
@@ -68,15 +68,15 @@ const Leaf = ({
         {...attributes}
       >
         {children}
-      </span>
+      </div>
     )
   }
 
   if (leaf.h1) {
     return (
-      <h1 {...attributes} className="relative">
+      <h1 {...attributes} className="relative -ml-3">
         <span
-          className="absolute -left-6 bottom-0 cursor-pointer h1-btn"
+          className="absolute -left-3 bottom-0 cursor-pointer h1-btn"
           onClick={changeHeading(leaf)}
           contentEditable={false}
         />
@@ -87,9 +87,9 @@ const Leaf = ({
 
   if (leaf.h2) {
     return (
-      <h2 {...attributes} className="relative">
+      <h2 {...attributes} className="relative -ml-2">
         <span
-          className="absolute -left-6 bottom-0 cursor-pointer h2-btn"
+          className="absolute -left-4 bottom-0 cursor-pointer h2-btn"
           onClick={changeHeading(leaf)}
           contentEditable={false}
         />
@@ -100,9 +100,9 @@ const Leaf = ({
 
   if (leaf.h3) {
     return (
-      <h3 {...attributes} className="relative">
+      <h3 {...attributes} className="relative -ml-1">
         <span
-          className="absolute -left-6 bottom-0 cursor-pointer h3-btn"
+          className="absolute -left-4 bottom-0 cursor-pointer h3-btn"
           onClick={changeHeading(leaf)}
           contentEditable={false}
         />
@@ -177,7 +177,11 @@ const Leaf = ({
   }
 
   if (leaf.blockquote) {
-    return <span {...attributes}>{children}</span>
+    return (
+      <span className="-ml-1" {...attributes}>
+        {children}
+      </span>
+    )
   }
 
   if (leaf.list && leaf.punctuation) {
@@ -197,6 +201,7 @@ const Leaf = ({
           }
           ref.parentNode.parentElement.className = 'list'
         }}
+        className="-ml-1"
         {...attributes}
       >
         {children}
