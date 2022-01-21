@@ -8,6 +8,12 @@ module.exports = {
         red: {
           450: '#f06332',
         },
+        qiqi: {
+          500: '#10B981',
+        },
+      },
+      backgroundImage: {
+        'hallowen-qiqi': "url('../public/images/qiqi-hallowen.png')",
       },
     },
   },
