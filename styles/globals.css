@@ -357,3 +357,33 @@ input {
 .label {
   @apply mb-1;
 }
+
+.circle1 {
+  position: absolute;
+  width: 50px;
+  padding: 20px;
+  border-radius: 50%;
+  right: -15px;
+  bottom: 23px;
+}
+
+.circle1:before {
+  content: "";
+  position: absolute;
+  width: 50px;
+  padding: 20px;
+  border-radius: 50%;
+  right: 0px;
+  bottom: 0px;
+  background: #ECFDF5;
+}
+
+.circle2 {
+  background: #ECFDF5;
+  position: absolute;
+  width: 5px;
+  padding: 10px 15px;
+  border-radius: 50%;
+  right: -60px;
+  bottom: 5px;
+}
